@@ -1,0 +1,405 @@
+﻿@model IEnumerable<CivicLink.Models.Issue>
+@{
+    ViewBag.Title = "All Issues - CivicLink";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid" style="margin-top: 2rem;">
+    <!-- Page Header -->
+    <div class="glass-card" style="padding: 2rem; margin-bottom: 2rem;">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h2 class="mb-2" style="font-weight: 700;">
+                    <i class="fas fa-list-ul me-3" style="color: var(--primary-color);"></i>
+                    All Reported Issues
+                </h2>
+                <p class="text-muted mb-0">Track and monitor community-reported issues</p>
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="@Url.Action("ReportIssue", "Home")" class="btn btn-apple">
+                    <i class="fas fa-plus me-2"></i>Report New Issue
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="glass-card" style="padding: 1.5rem; margin-bottom: 2rem;">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="form-label">Filter by Category</label>
+                    <select id="categoryFilter" class="form-select">
+                        <option value="">All Categories</option>
+                        <option value="WaterAndSanitation">Water & Sanitation</option>
+                        <option value="RoadsAndTransport">Roads & Transport</option>
+                        <option value="ElectricityAndPower">Electricity & Power</option>
+                        <option value="WasteManagement">Waste Management</option>
+                        <option value="PublicSafety">Public Safety</option>
+                        <option value="ParksAndRecreation">Parks & Recreation</option>
+                        <option value="Housing">Housing</option>
+                        <option value="BusinessLicensing">Business Licensing</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="form-label">Filter by Status</label>
+                    <select id="statusFilter" class="form-select">
+                        <option value="">All Statuses</option>
+                        <option value="Submitted">Submitted</option>
+                        <option value="InReview">In Review</option>
+                        <option value="InProgress">In Progress</option>
+                        <option value="Resolved">Resolved</option>
+                        <option value="Closed">Closed</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="form-label">Search Issues</label>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search by title or location...">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Issues Grid -->
+    <div class="row" id="issuesContainer">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var issue in Model)
+            {
+                <div class="col-lg-6 col-xl-4 mb-4 issue-card"
+                     data-category="@issue.Category"
+                     data-status="@issue.Status"
+                     data-search="@issue.Title.ToLower() @issue.Location.ToLower() @issue.Description.ToLower()">
+                    <div class="glass-card priority-@issue.Priority.ToString().ToLower()" style="padding: 1.5rem; height: 100%; transition: all 0.3s ease;">
+                        <!-- Issue Header -->
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="flex-grow-1">
+                                <h5 class="mb-1" style="font-weight: 600; line-height: 1.3;">@issue.Title</h5>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar-alt me-1"></i>
+                                    @issue.CreatedAt.ToString("MMM dd, yyyy")
+                                </small>
+                            </div>
+                            <div class="text-end">
+                                <span class="status-badge status-@issue.Status.ToString().ToLower()">
+                                    @issue.Status.ToString()
+                                </span>
+                                <div class="mt-1">
+                                    <small class="text-muted">#@issue.Id.ToString("D4")</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Category and Priority -->
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="badge bg-secondary me-2" style="font-size: 0.8rem;">
+                                @GetCategoryIcon(issue.Category) @GetCategoryDisplayName(issue.Category)
+                            </span>
+                            <span class="badge priority-badge-@issue.Priority.ToString().ToLower()" style="font-size: 0.8rem;">
+                                @GetPriorityIcon(issue.Priority) @issue.Priority
+                            </span>
+                        </div>
+
+                        <!-- Location -->
+                        <div class="mb-3">
+                            <i class="fas fa-map-marker-alt text-muted me-2"></i>
+                            <span class="text-muted">@issue.Location</span>
+                        </div>
+
+                        <!-- Description Preview -->
+                        <p class="text-muted mb-3" style="font-size: 0.9rem; line-height: 1.4;">
+                            @(issue.Description.Length > 100 ? issue.Description.Substring(0, 100) + "..." : issue.Description)
+                        </p>
+
+                        <!-- Contact Info -->
+                        @if (!string.IsNullOrEmpty(issue.ContactName))
+                        {
+                            <div class="mb-3" style="font-size: 0.9rem;">
+                                <i class="fas fa-user text-muted me-2"></i>
+                                <span class="text-muted">@issue.ContactName</span>
+                            </div>
+                        }
+
+                        <!-- Action Button -->
+                        <div class="mt-auto">
+                            <a href="@Url.Action("IssueDetails", "Home", new { id = issue.Id })"
+                               class="btn btn-secondary-apple w-100">
+                                <i class="fas fa-eye me-2"></i>View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <div class="glass-card text-center" style="padding: 3rem;">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h4>No Issues Found</h4>
+                    <p class="text-muted mb-3">There are currently no issues reported in the system.</p>
+                    <a href="@Url.Action("ReportIssue", "Home")" class="btn btn-apple">
+                        <i class="fas fa-plus me-2"></i>Report the First Issue
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- No Results Message (Hidden by default) -->
+    <div id="noResults" class="col-12" style="display: none;">
+        <div class="glass-card text-center" style="padding: 3rem;">
+            <i class="fas fa-filter fa-3x text-muted mb-3"></i>
+            <h4>No Issues Match Your Filters</h4>
+            <p class="text-muted mb-3">Try adjusting your search criteria or clear the filters.</p>
+            <button class="btn btn-secondary-apple" onclick="clearFilters()">
+                <i class="fas fa-times me-2"></i>Clear All Filters
+            </button>
+        </div>
+    </div>
+
+    <!-- Statistics Summary -->
+    <div class="glass-card mt-4" style="padding: 2rem;">
+        <h5 class="mb-3">
+            <i class="fas fa-chart-pie me-2"></i>Issues Summary
+        </h5>
+        <div class="row text-center">
+            <div class="col-6 col-md-3 mb-3">
+                <div class="stat-item">
+                    <i class="fas fa-exclamation-circle fa-2x text-primary mb-2"></i>
+                    <div class="stat-number" style="font-size: 1.5rem; color: var(--dark-color);">@(Model?.Count() ?? 0)</div>
+                    <div class="stat-label">Total Issues</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 mb-3">
+                <div class="stat-item">
+                    <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                    <div class="stat-number" style="font-size: 1.5rem; color: var(--dark-color);">@(Model?.Count(i => i.Status == CivicLink.Models.IssueStatus.Submitted || i.Status == CivicLink.Models.IssueStatus.InReview) ?? 0)</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 mb-3">
+                <div class="stat-item">
+                    <i class="fas fa-cogs fa-2x text-info mb-2"></i>
+                    <div class="stat-number" style="font-size: 1.5rem; color: var(--dark-color);">@(Model?.Count(i => i.Status == CivicLink.Models.IssueStatus.InProgress) ?? 0)</div>
+                    <div class="stat-label">In Progress</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 mb-3">
+                <div class="stat-item">
+                    <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                    <div class="stat-number" style="font-size: 1.5rem; color: var(--dark-color);">@(Model?.Count(i => i.Status == CivicLink.Models.IssueStatus.Resolved) ?? 0)</div>
+                    <div class="stat-label">Resolved</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetCategoryIcon(CivicLink.Models.IssueCategory category)
+    {
+        return category switch
+        {
+            CivicLink.Models.IssueCategory.WaterAndSanitation => "💧",
+            CivicLink.Models.IssueCategory.RoadsAndTransport => "🚗",
+            CivicLink.Models.IssueCategory.ElectricityAndPower => "⚡",
+            CivicLink.Models.IssueCategory.WasteManagement => "♻️",
+            CivicLink.Models.IssueCategory.PublicSafety => "🛡️",
+            CivicLink.Models.IssueCategory.ParksAndRecreation => "🌳",
+            CivicLink.Models.IssueCategory.Housing => "🏠",
+            CivicLink.Models.IssueCategory.BusinessLicensing => "📋",
+            _ => "📝"
+        };
+    }
+
+    string GetCategoryDisplayName(CivicLink.Models.IssueCategory category)
+    {
+        return category switch
+        {
+            CivicLink.Models.IssueCategory.WaterAndSanitation => "Water & Sanitation",
+            CivicLink.Models.IssueCategory.RoadsAndTransport => "Roads & Transport",
+            CivicLink.Models.IssueCategory.ElectricityAndPower => "Electricity & Power",
+            CivicLink.Models.IssueCategory.WasteManagement => "Waste Management",
+            CivicLink.Models.IssueCategory.PublicSafety => "Public Safety",
+            CivicLink.Models.IssueCategory.ParksAndRecreation => "Parks & Recreation",
+            CivicLink.Models.IssueCategory.BusinessLicensing => "Business Licensing",
+            _ => category.ToString()
+        };
+    }
+
+    string GetPriorityIcon(CivicLink.Models.IssuePriority priority)
+    {
+        return priority switch
+        {
+            CivicLink.Models.IssuePriority.Low => "🔵",
+            CivicLink.Models.IssuePriority.Medium => "🟡",
+            CivicLink.Models.IssuePriority.High => "🟠",
+            CivicLink.Models.IssuePriority.Critical => "🔴",
+            _ => "⚪"
+        };
+    }
+}
+
+@section Scripts {
+    <style>
+        .priority-badge-low {
+            background: rgba(52, 199, 89, 0.1);
+            color: var(--success-color);
+        }
+
+        .priority-badge-medium {
+            background: rgba(255, 149, 0, 0.1);
+            color: var(--warning-color);
+        }
+
+        .priority-badge-high {
+            background: rgba(255, 59, 48, 0.1);
+            color: var(--danger-color);
+        }
+
+        .priority-badge-critical {
+            background: rgba(139, 0, 0, 0.1);
+            color: #8B0000;
+        }
+
+        .issue-card {
+            transition: all 0.3s ease;
+        }
+
+            .issue-card .glass-card:hover {
+                transform: translateY(-5px);
+                box-shadow: var(--hover-shadow);
+            }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const categoryFilter = document.getElementById('categoryFilter');
+            const statusFilter = document.getElementById('statusFilter');
+            const searchInput = document.getElementById('searchInput');
+            const issuesContainer = document.getElementById('issuesContainer');
+            const noResults = document.getElementById('noResults');
+
+            // Filter functionality
+            function filterIssues() {
+                const categoryValue = categoryFilter.value.toLowerCase();
+                const statusValue = statusFilter.value.toLowerCase();
+                const searchValue = searchInput.value.toLowerCase();
+
+                const issueCards = document.querySelectorAll('.issue-card');
+                let visibleCount = 0;
+
+                issueCards.forEach(card => {
+                    const category = card.getAttribute('data-category').toLowerCase();
+                    const status = card.getAttribute('data-status').toLowerCase();
+                    const searchData = card.getAttribute('data-search');
+
+                    const categoryMatch = !categoryValue || category.includes(categoryValue);
+                    const statusMatch = !statusValue || status.includes(statusValue);
+                    const searchMatch = !searchValue || searchData.includes(searchValue);
+
+                    if (categoryMatch && statusMatch && searchMatch) {
+                        card.style.display = 'block';
+                        card.style.animation = 'fadeInUp 0.3s ease-out';
+                        visibleCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                // Show/hide no results message
+                if (visibleCount === 0) {
+                    noResults.style.display = 'block';
+                    noResults.style.animation = 'fadeInUp 0.3s ease-out';
+                } else {
+                    noResults.style.display = 'none';
+                }
+            }
+
+            // Add event listeners
+            categoryFilter.addEventListener('change', filterIssues);
+            statusFilter.addEventListener('change', filterIssues);
+            searchInput.addEventListener('input', debounce(filterIssues, 300));
+
+            // Debounce function for search input
+            function debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+
+            // Clear filters function
+            window.clearFilters = function () {
+                categoryFilter.value = '';
+                statusFilter.value = '';
+                searchInput.value = '';
+                filterIssues();
+            };
+
+            // Add hover effects to cards
+            const cards = document.querySelectorAll('.issue-card .glass-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function () {
+                    this.style.transform = 'translateY(-5px) scale(1.02)';
+                });
+
+                card.addEventListener('mouseleave', function () {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Animate stats on scroll
+            const animateStats = () => {
+                const statNumbers = document.querySelectorAll('.stat-number');
+                statNumbers.forEach(stat => {
+                    const finalNumber = parseInt(stat.textContent);
+                    if (finalNumber && !stat.hasAttribute('data-animated')) {
+                        stat.setAttribute('data-animated', 'true');
+                        animateValue(stat, 0, finalNumber, 1500);
+                    }
+                });
+            };
+
+            const animateValue = (element, start, end, duration) => {
+                let startTimestamp = null;
+                const step = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                    const current = Math.floor(progress * (end - start) + start);
+                    element.textContent = current;
+
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    }
+                };
+                window.requestAnimationFrame(step);
+            };
+
+            // Trigger animation when stats come into view
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        animateStats();
+                    }
+                });
+            });
+
+            const statsSection = document.querySelector('.glass-card:last-child');
+            if (statsSection) {
+                observer.observe(statsSection);
+            }
+        });
+    </script>
+}

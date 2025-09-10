@@ -38,7 +38,8 @@
                 </div>
 
                 <form asp-action="ReportIssue" method="post" enctype="multipart/form-data" id="issueForm">
-                    <div asp-validation-summary="All" class="alert-danger-apple" style="display: none;"></div>
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="alert-danger-apple" style="display: none;"></div>
 
                     <!-- Issue Title -->
                     <div class="form-group">

@@ -1,0 +1,467 @@
+﻿@model CivicLink.Models.Issue
+@{
+    ViewBag.Title = "Issue Details - CivicLink";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid" style="margin-top: 2rem;">
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb glass-card" style="padding: 1rem; margin: 0;">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "Home")" style="color: var(--primary-color);">
+                    <i class="fas fa-home me-1"></i>Home
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("IssuesList", "Home")" style="color: var(--primary-color);">
+                    <i class="fas fa-list me-1"></i>All Issues
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                Issue #@Model.Id.ToString("D4")
+            </li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Issue Header -->
+            <div class="glass-card priority-@Model.Priority.ToString().ToLower()" style="padding: 2rem; margin-bottom: 1.5rem;">
+                <div class="row align-items-start">
+                    <div class="col">
+                        <div class="d-flex align-items-center mb-2">
+                            <h1 class="mb-0 me-3" style="font-weight: 700; font-size: 1.8rem;">@Model.Title</h1>
+                            <span class="status-badge status-@Model.Status.ToString().ToLower()" style="font-size: 0.9rem;">
+                                @Model.Status.ToString()
+                            </span>
+                        </div>
+
+                        <div class="d-flex align-items-center flex-wrap gap-3 mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-hashtag me-1 text-muted"></i>
+                                <span class="text-muted">#@Model.Id.ToString("D4")</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-calendar-alt me-1 text-muted"></i>
+                                <span class="text-muted">@Model.CreatedAt.ToString("MMMM dd, yyyy")</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-clock me-1 text-muted"></i>
+                                <span class="text-muted">@Model.CreatedAt.ToString("HH:mm")</span>
+                            </div>
+                            @if (Model.UpdatedAt.HasValue)
+                            {
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-sync-alt me-1 text-muted"></i>
+                                    <span class="text-muted">Updated @Model.UpdatedAt.Value.ToString("MMM dd")</span>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Category and Priority Badges -->
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-secondary" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                                @GetCategoryIcon(Model.Category) @GetCategoryDisplayName(Model.Category)
+                            </span>
+                            <span class="badge priority-badge-@Model.Priority.ToString().ToLower()" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                                @GetPriorityIcon(Model.Priority) @Model.Priority Priority
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Issue Description -->
+            <div class="glass-card" style="padding: 2rem; margin-bottom: 1.5rem;">
+                <h4 class="mb-3" style="font-weight: 600;">
+                    <i class="fas fa-info-circle me-2" style="color: var(--primary-color);"></i>
+                    Description
+                </h4>
+                <p style="font-size: 1.1rem; line-height: 1.6; color: var(--dark-color); white-space: pre-wrap;">@Model.Description</p>
+            </div>
+
+            <!-- Location Details -->
+            <div class="glass-card" style="padding: 2rem; margin-bottom: 1.5rem;">
+                <h4 class="mb-3" style="font-weight: 600;">
+                    <i class="fas fa-map-marker-alt me-2" style="color: var(--primary-color);"></i>
+                    Location
+                </h4>
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-location-dot me-3 text-muted fa-lg"></i>
+                    <div>
+                        <div style="font-size: 1.1rem; font-weight: 500;">@Model.Location</div>
+                        <small class="text-muted">Exact location as reported by the citizen</small>
+                    </div>
+                </div>
+
+                <!-- Map Placeholder -->
+                <div class="mt-3 p-4 text-center" style="background: var(--light-gray); border-radius: var(--border-radius); border: 2px dashed var(--medium-gray);">
+                    <i class="fas fa-map fa-2x text-muted mb-2"></i>
+                    <div class="text-muted">Map integration coming soon</div>
+                    <small class="text-muted">Interactive map will show precise location</small>
+                </div>
+            </div>
+
+            <!-- Attachments -->
+            @if (Model.AttachmentPaths != null && Model.AttachmentPaths.Any())
+            {
+                <div class="glass-card" style="padding: 2rem; margin-bottom: 1.5rem;">
+                    <h4 class="mb-3" style="font-weight: 600;">
+                        <i class="fas fa-paperclip me-2" style="color: var(--primary-color);"></i>
+                        Attachments
+                    </h4>
+                    <div class="row">
+                        @foreach (var attachment in Model.AttachmentPaths)
+                        {
+                            <div class="col-md-4 mb-3">
+                                <div class="card" style="border: 1px solid rgba(142, 142, 147, 0.2); border-radius: var(--border-radius);">
+                                    <div class="card-body text-center p-3">
+                                        <i class="fas fa-file-alt fa-2x text-muted mb-2"></i>
+                                        <div class="small">@(attachment.Contains("/") || attachment.Contains("\\") ? attachment.Substring(Math.Max(attachment.LastIndexOf('/'), attachment.LastIndexOf('\\')) + 1) : attachment)</div>
+                                        <button class="btn btn-sm btn-secondary-apple mt-2">
+                                            <i class="fas fa-download me-1"></i>Download
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- Action Buttons -->
+            <div class="glass-card" style="padding: 1.5rem;">
+                <div class="d-flex gap-3 flex-wrap justify-content-center">
+                    <a href="@Url.Action("IssuesList", "Home")" class="btn btn-secondary-apple">
+                        <i class="fas fa-arrow-left me-2"></i>Back to All Issues
+                    </a>
+                    <button class="btn btn-apple" onclick="shareIssue()">
+                        <i class="fas fa-share-alt me-2"></i>Share Issue
+                    </button>
+                    <button class="btn btn-secondary-apple" onclick="reportUpdate()">
+                        <i class="fas fa-flag me-2"></i>Report Update
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Issue Status Timeline -->
+            <div class="glass-card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
+                <h5 class="mb-3" style="font-weight: 600;">
+                    <i class="fas fa-history me-2"></i>Status Timeline
+                </h5>
+
+                <div class="timeline">
+                    <div class="timeline-item active">
+                        <div class="timeline-marker bg-success"></div>
+                        <div class="timeline-content">
+                            <div class="fw-bold">Issue Submitted</div>
+                            <small class="text-muted">@Model.CreatedAt.ToString("MMM dd, yyyy HH:mm")</small>
+                        </div>
+                    </div>
+
+                    @if (Model.Status >= CivicLink.Models.IssueStatus.InReview)
+                    {
+                        <div class="timeline-item active">
+                            <div class="timeline-marker bg-warning"></div>
+                            <div class="timeline-content">
+                                <div class="fw-bold">Under Review</div>
+                                <small class="text-muted">Review in progress</small>
+                            </div>
+                        </div>
+                    }
+
+                    @if (Model.Status >= CivicLink.Models.IssueStatus.InProgress)
+                    {
+                        <div class="timeline-item active">
+                            <div class="timeline-marker bg-info"></div>
+                            <div class="timeline-content">
+                                <div class="fw-bold">In Progress</div>
+                                <small class="text-muted">Work has begun</small>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="timeline-item @(Model.Status >= CivicLink.Models.IssueStatus.Resolved ? "active" : "")">
+                        <div class="timeline-marker @(Model.Status >= CivicLink.Models.IssueStatus.Resolved ? "bg-success" : "bg-light")"></div>
+                        <div class="timeline-content">
+                            <div class="fw-bold">Resolved</div>
+                            <small class="text-muted">
+                                @if (Model.Status >= CivicLink.Models.IssueStatus.Resolved && Model.UpdatedAt.HasValue)
+                                {
+                                    @Model.UpdatedAt.Value.ToString("MMM dd, yyyy")
+                                }
+                                else
+                                {
+                                    <span>Pending resolution</span>
+                                }
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            @if (!string.IsNullOrEmpty(Model.ContactName) || !string.IsNullOrEmpty(Model.ContactEmail) || !string.IsNullOrEmpty(Model.ContactPhone))
+            {
+                <div class="glass-card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
+                    <h5 class="mb-3" style="font-weight: 600;">
+                        <i class="fas fa-address-card me-2"></i>Contact Information
+                    </h5>
+
+                    @if (!string.IsNullOrEmpty(Model.ContactName))
+                    {
+                        <div class="mb-2">
+                            <i class="fas fa-user me-2 text-muted"></i>
+                            <strong>@Model.ContactName</strong>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.ContactEmail))
+                    {
+                        <div class="mb-2">
+                            <i class="fas fa-envelope me-2 text-muted"></i>
+                            <a href="mailto:@Model.ContactEmail" style="color: var(--primary-color);">@Model.ContactEmail</a>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.ContactPhone))
+                    {
+                        <div class="mb-2">
+                            <i class="fas fa-phone me-2 text-muted"></i>
+                            <a href="tel:@Model.ContactPhone" style="color: var(--primary-color);">@Model.ContactPhone</a>
+                        </div>
+                    }
+                </div>
+            }
+
+            <!-- Issue Statistics -->
+            <div class="glass-card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
+                <h5 class="mb-3" style="font-weight: 600;">
+                    <i class="fas fa-chart-bar me-2"></i>Issue Details
+                </h5>
+
+                <div class="row text-center">
+                    <div class="col-6 mb-3">
+                        <div class="stat-item">
+                            <i class="fas fa-calendar-plus fa-lg text-primary mb-1"></i>
+                            <div class="stat-number" style="font-size: 1rem; color: var(--dark-color);">@((DateTime.Now - Model.CreatedAt).Days)</div>
+                            <div class="stat-label" style="font-size: 0.8rem;">Days Open</div>
+                        </div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="stat-item">
+                            <i class="fas fa-flag fa-lg text-warning mb-1"></i>
+                            <div class="stat-number" style="font-size: 1rem; color: var(--dark-color);">@((int)Model.Priority)/4</div>
+                            <div class="stat-label" style="font-size: 0.8rem;">Priority Level</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3 p-2" style="background: rgba(0, 122, 255, 0.1); border-radius: 8px; text-center;">
+                    <small>
+                        <i class="fas fa-info-circle me-1"></i>
+                        Issue ID: <strong>#@Model.Id.ToString("D4")</strong>
+                    </small>
+                </div>
+            </div>
+
+            <!-- Related Actions -->
+            <div class="glass-card" style="padding: 1.5rem;">
+                <h5 class="mb-3" style="font-weight: 600;">
+                    <i class="fas fa-tools me-2"></i>Quick Actions
+                </h5>
+
+                <div class="d-grid gap-2">
+                    <button class="btn btn-secondary-apple" onclick="followIssue()">
+                        <i class="fas fa-bell me-2"></i>Follow for Updates
+                    </button>
+                    <button class="btn btn-secondary-apple" onclick="reportSimilar()">
+                        <i class="fas fa-plus me-2"></i>Report Similar Issue
+                    </button>
+                    <button class="btn btn-secondary-apple" onclick="printIssue()">
+                        <i class="fas fa-print me-2"></i>Print Details
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetCategoryIcon(CivicLink.Models.IssueCategory category)
+    {
+        return category switch
+        {
+            CivicLink.Models.IssueCategory.WaterAndSanitation => "💧",
+            CivicLink.Models.IssueCategory.RoadsAndTransport => "🚗",
+            CivicLink.Models.IssueCategory.ElectricityAndPower => "⚡",
+            CivicLink.Models.IssueCategory.WasteManagement => "♻️",
+            CivicLink.Models.IssueCategory.PublicSafety => "🛡️",
+            CivicLink.Models.IssueCategory.ParksAndRecreation => "🌳",
+            CivicLink.Models.IssueCategory.Housing => "🏠",
+            CivicLink.Models.IssueCategory.BusinessLicensing => "📋",
+            _ => "📝"
+        };
+    }
+
+    string GetCategoryDisplayName(CivicLink.Models.IssueCategory category)
+    {
+        return category switch
+        {
+            CivicLink.Models.IssueCategory.WaterAndSanitation => "Water & Sanitation",
+            CivicLink.Models.IssueCategory.RoadsAndTransport => "Roads & Transport",
+            CivicLink.Models.IssueCategory.ElectricityAndPower => "Electricity & Power",
+            CivicLink.Models.IssueCategory.WasteManagement => "Waste Management",
+            CivicLink.Models.IssueCategory.PublicSafety => "Public Safety",
+            CivicLink.Models.IssueCategory.ParksAndRecreation => "Parks & Recreation",
+            CivicLink.Models.IssueCategory.BusinessLicensing => "Business Licensing",
+            _ => category.ToString()
+        };
+    }
+
+    string GetPriorityIcon(CivicLink.Models.IssuePriority priority)
+    {
+        return priority switch
+        {
+            CivicLink.Models.IssuePriority.Low => "🔵",
+            CivicLink.Models.IssuePriority.Medium => "🟡",
+            CivicLink.Models.IssuePriority.High => "🟠",
+            CivicLink.Models.IssuePriority.Critical => "🔴",
+            _ => "⚪"
+        };
+    }
+}
+
+@section Scripts {
+    <style>
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+            .timeline::before {
+                content: '';
+                position: absolute;
+                left: 10px;
+                top: 0;
+                bottom: 0;
+                width: 2px;
+                background: var(--light-gray);
+            }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -25px;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .timeline-item.active .timeline-marker {
+            animation: pulse 2s infinite;
+        }
+
+        @@keyframes pulse {
+            0% {
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+
+            50% {
+                box-shadow: 0 2px 8px rgba(0,122,255,0.3), 0 0 0 8px rgba(0,122,255,0.1);
+            }
+
+            100% {
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+        }
+
+        .priority-badge-low {
+            background: rgba(52, 199, 89, 0.1);
+            color: var(--success-color);
+        }
+
+        .priority-badge-medium {
+            background: rgba(255, 149, 0, 0.1);
+            color: var(--warning-color);
+        }
+
+        .priority-badge-high {
+            background: rgba(255, 59, 48, 0.1);
+            color: var(--danger-color);
+        }
+
+        .priority-badge-critical {
+            background: rgba(139, 0, 0, 0.1);
+            color: #8B0000;
+        }
+
+        .breadcrumb a {
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+            .breadcrumb a:hover {
+                transform: translateY(-1px);
+            }
+    </style>
+
+    <script>
+        function shareIssue() {
+            if (navigator.share) {
+                navigator.share({
+                    title: '@Model.Title',
+                    text: 'Check out this community issue: @Model.Title',
+                    url: window.location.href
+                });
+            } else {
+                // Fallback: copy to clipboard
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    alert('Issue link copied to clipboard!');
+                });
+            }
+        }
+
+        function reportUpdate() {
+            alert('Update reporting feature coming soon! You will be able to provide updates on issue progress.');
+        }
+
+        function followIssue() {
+            alert('Following feature coming soon! You will receive notifications when this issue is updated.');
+        }
+
+        function reportSimilar() {
+            const reportUrl = '@Url.Action("ReportIssue", "Home")' +
+                '?category=@Model.Category' +
+                '&priority=@Model.Priority';
+            window.location.href = reportUrl;
+        }
+
+        function printIssue() {
+            window.print();
+        }
+
+        // Add smooth scroll effect for internal links
+        document.addEventListener('DOMContentLoaded', function () {
+            // Animate timeline items on scroll
+            const timelineItems = document.querySelectorAll('.timeline-item');
+            timelineItems.forEach((item, index) => {
+                setTimeout(() => {
+                    item.style.animation = `slideIn 0.5s ease-out forwards`;
+                }, index * 200);
+            });
+        });
+    </script>
+}

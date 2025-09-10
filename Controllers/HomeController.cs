@@ -45,7 +45,12 @@ namespace CivicLink.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ReportIssue(ReportIssueViewModel model)
         {
-            if (ModelState.IsValid)
+            // Only validate the Issue part of the model
+            ModelState.Remove("UserEngagement");
+            ModelState.Remove("AvailableBadges");
+            ModelState.Remove("SuccessMessage");
+
+            if (ModelState.IsValid && model.Issue != null)
             {
                 try
                 {
@@ -59,7 +64,7 @@ namespace CivicLink.Controllers
 
                     // Set success message
                     TempData["SuccessMessage"] = $"Issue reported successfully! Issue ID: {issueId}. You earned {pointsEarned} points!";
-                    TempData["ShowBadges"] = updatedEngagement.Badges.Count > model.UserEngagement.Badges.Count;
+                    TempData["ShowBadges"] = updatedEngagement.Badges.Count > (model.UserEngagement?.Badges.Count ?? 0);
 
                     return RedirectToAction(nameof(ReportIssue));
                 }
