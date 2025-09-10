@@ -3,6 +3,7 @@ using CivicLink.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
+// Main controller handling issue reporting, dashboard display, and user interaction with no business logic
 namespace CivicLink.Controllers
 {
     public class HomeController : Controller

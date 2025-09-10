@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
+// Core Issue entity model with validation, enums, and properties for municipal problem reporting
 namespace CivicLink.Models
 {
     public class Issue

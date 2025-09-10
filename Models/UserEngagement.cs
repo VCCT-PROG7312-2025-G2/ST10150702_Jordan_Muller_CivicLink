@@ -1,4 +1,7 @@
-﻿namespace CivicLink.Models
+﻿
+
+// User engagement models for gamification including points, levels, badges, and achievement tracking
+namespace CivicLink.Models
 {
     public class UserEngagement
     {

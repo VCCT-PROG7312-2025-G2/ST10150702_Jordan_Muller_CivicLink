@@ -2,7 +2,7 @@
 
 namespace CivicLink.DataStructures
 {
-    // Custom LinkedList implementation for storing issues
+    // Custom data structures (LinkedList, PriorityQueue, Stack) replacing primitive arrays/lists for issue management
     public class IssueLinkedList
     {
         private IssueNode head;

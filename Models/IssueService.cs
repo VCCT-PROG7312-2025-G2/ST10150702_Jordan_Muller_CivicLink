@@ -1,6 +1,8 @@
 ﻿using CivicLink.Models;
 using CivicLink.DataStructures;
 
+
+// Business logic service for issue management using custom data structures (no primitive arrays/lists)
 namespace CivicLink.Services
 {
     public interface IIssueService

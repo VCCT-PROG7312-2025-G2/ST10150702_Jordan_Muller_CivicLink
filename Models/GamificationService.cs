@@ -1,6 +1,7 @@
 ﻿using CivicLink.Models;
 using CivicLink.DataStructures;
 
+// Service managing user engagement, points, levels, and badge system to encourage civic participation
 namespace CivicLink.Services
 {
     public interface IGamificationService
