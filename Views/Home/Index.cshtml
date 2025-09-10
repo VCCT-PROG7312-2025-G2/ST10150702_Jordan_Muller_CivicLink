@@ -16,43 +16,90 @@
 
         @if (userEngagement != null)
         {
-            <!-- User Stats Display -->
-            <div class="user-stats" style="max-width: 600px; margin: 2rem auto 0;">
-                <div class="row">
-                    <div class="col-4">
-                        <div class="stat-item">
-                            <span class="stat-number">@userEngagement.Level</span>
-                            <span class="stat-label">Level</span>
+            <!-- Elegant User Stats Display -->
+            <div style="max-width: 600px; margin: 2rem auto 0; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 25px; padding: 2rem; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);">
+                <div style="display: flex; align-items: center; justify-content: space-around; margin-bottom: 2rem; flex-wrap: nowrap; gap: 1rem;">
+                    <div style="display: flex; flex-direction: column; align-items: center; text-align: center; flex: 1;">
+                        <div style="width: 50px; height: 50px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); transition: all 0.3s ease; margin-bottom: 0.5rem; background: linear-gradient(135deg, #FF6B6B, #FF8E8E);">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <span style="font-size: 1.8rem; font-weight: 700; color: #1C1C1E; line-height: 1; margin-bottom: 0.25rem;">@userEngagement.Level</span>
+                            <span style="font-size: 0.85rem; color: #8E8E93; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Level</span>
                         </div>
                     </div>
-                    <div class="col-4">
-                        <div class="stat-item">
-                            <span class="stat-number">@userEngagement.Points</span>
-                            <span class="stat-label">Points</span>
+
+                    <div style="width: 1px; height: 60px; background: linear-gradient(to bottom, transparent, rgba(142, 142, 147, 0.3), transparent); flex-shrink: 0;"></div>
+
+                    <div style="display: flex; flex-direction: column; align-items: center; text-align: center; flex: 1;">
+                        <div style="width: 50px; height: 50px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #333; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); transition: all 0.3s ease; margin-bottom: 0.5rem; background: linear-gradient(135deg, #FFD93D, #FFE066);">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <span style="font-size: 1.8rem; font-weight: 700; color: #1C1C1E; line-height: 1; margin-bottom: 0.25rem;">@userEngagement.Points</span>
+                            <span style="font-size: 0.85rem; color: #8E8E93; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Points</span>
                         </div>
                     </div>
-                    <div class="col-4">
-                        <div class="stat-item">
-                            <span class="stat-number">@userEngagement.IssuesReported</span>
-                            <span class="stat-label">Reports</span>
+
+                    <div style="width: 1px; height: 60px; background: linear-gradient(to bottom, transparent, rgba(142, 142, 147, 0.3), transparent); flex-shrink: 0;"></div>
+
+                    <div style="display: flex; flex-direction: column; align-items: center; text-align: center; flex: 1;">
+                        <div style="width: 50px; height: 50px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); transition: all 0.3s ease; margin-bottom: 0.5rem; background: linear-gradient(135deg, #6BCF7F, #7ED492);">
+                            <i class="fas fa-flag"></i>
                         </div>
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <span style="font-size: 1.8rem; font-weight: 700; color: #1C1C1E; line-height: 1; margin-bottom: 0.25rem;">@userEngagement.IssuesReported</span>
+                            <span style="font-size: 0.85rem; color: #8E8E93; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Reports</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Ring for Next Level -->
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; margin: 1rem 0;">
+                    @{
+                        var nextLevelPoints = (userEngagement.Level * 150);
+                        var currentProgress = Math.Min((double)userEngagement.Points / nextLevelPoints * 100, 100);
+                    }
+                    <div style="position: relative; display: flex; align-items: center; justify-content: center;">
+                        <svg width="60" height="60">
+                            <circle cx="30"
+                                    cy="30"
+                                    r="25"
+                                    stroke="rgba(0, 122, 255, 0.2)"
+                                    stroke-width="4"
+                                    fill="transparent" />
+                            <circle cx="30"
+                                    cy="30"
+                                    r="25"
+                                    stroke="#007AFF"
+                                    stroke-width="4"
+                                    fill="transparent"
+                                    stroke-dasharray="157"
+                                    stroke-dashoffset="@(157 - (157 * currentProgress / 100))"
+                                    style="transition: stroke-dashoffset 1s ease-in-out; transform: rotate(-90deg); transform-origin: 50% 50%;" />
+                        </svg>
+                        <div style="position: absolute; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 600; color: #007AFF;">
+                            <span>@((int)currentProgress)%</span>
+                        </div>
+                    </div>
+                    <div style="color: #8E8E93; font-size: 0.85rem; text-align: center;">
+                        <small>@(nextLevelPoints - userEngagement.Points) to Level @(userEngagement.Level + 1)</small>
                     </div>
                 </div>
 
                 @if (userEngagement.Badges.Any())
                 {
-                    <div class="badge-container justify-content-center">
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 1rem;">
                         @foreach (var badge in userEngagement.Badges.Take(3))
                         {
-                            <div class="badge-item earned">
-                                <i class="@badge.IconClass badge-icon"></i>
-                                <span>@badge.Name</span>
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #007AFF, #5856D6); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3); transition: all 0.3s ease; cursor: pointer;" title="@badge.Description">
+                                <i class="@badge.IconClass"></i>
                             </div>
                         }
                         @if (userEngagement.Badges.Count > 3)
                         {
-                            <div class="badge-item">
-                                <span>+@(userEngagement.Badges.Count - 3) more</span>
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #8E8E93, #A0A0A0); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 600; box-shadow: 0 4px 15px rgba(142, 142, 147, 0.3); transition: all 0.3s ease; cursor: pointer;" title="@(userEngagement.Badges.Count - 3) more badges">
+                                <span>+@(userEngagement.Badges.Count - 3)</span>
                             </div>
                         }
                     </div>
