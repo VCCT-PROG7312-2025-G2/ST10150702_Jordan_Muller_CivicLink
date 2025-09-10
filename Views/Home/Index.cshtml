@@ -1,0 +1,30 @@
+﻿@{
+    ViewBag.Title = "CivicLink";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="container" style="margin-top:30px;">
+    <h1>CivicLink</h1>
+    <p>Welcome to CivicLink. Use the options below to interact with municipal services.</p>
+
+    <div class="row" style="margin-top:20px;">
+        <div class="col-md-4">
+            <a class="btn btn-primary btn-lg btn-block" href="@Url.Action("ReportIssue", "Home")">
+                1. Report Issues
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <button class="btn btn-secondary btn-lg btn-block" disabled>
+                2. Local Events and Announcements (Disabled)
+            </button>
+        </div>
+
+        <div class="col-md-4">
+            <button class="btn btn-secondary btn-lg btn-block" disabled>
+                3. Service Request Status (Disabled)
+            </button>
+        </div>
+    </div>
+</div>
