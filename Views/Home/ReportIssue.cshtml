@@ -1,11 +1,405 @@
-﻿@{
-    ViewBag.Title = "Report Issues";
+﻿@model CivicLink.Models.ReportIssueViewModel
+@{
+    ViewBag.Title = "Report Issues - CivicLink";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container" style="margin-top:30px;">
-    <h2>Report Issues</h2>
-    <p>This is a placeholder for the Report Issues workflow. For Phase 1, UI elements for collecting issue details and attachments will appear here.</p>
+<div class="container-fluid" style="margin-top: 2rem;">
+    <!-- Success Message -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert-success-apple">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-check-circle me-2"></i>
+                <div>
+                    <strong>Success!</strong> @TempData["SuccessMessage"]
+                    @if (TempData["ShowBadges"] != null && (bool)TempData["ShowBadges"])
+                    {
+                        <div class="mt-2">
+                            <i class="fas fa-award text-warning me-1"></i>
+                            <small>You've earned new badges! Check your profile to see them.</small>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
 
-    <p><em>Note: this is a static placeholder. No submission or database is configured.</em></p>
+    <div class="row">
+        <!-- Main Form -->
+        <div class="col-lg-8">
+            <div class="glass-card" style="padding: 2rem;">
+                <div class="d-flex align-items-center mb-4">
+                    <i class="fas fa-exclamation-triangle me-3" style="font-size: 2rem; color: var(--primary-color);"></i>
+                    <div>
+                        <h2 style="margin: 0; font-weight: 700;">Report an Issue</h2>
+                        <p style="margin: 0; color: var(--medium-gray);">Help us improve your community by reporting issues</p>
+                    </div>
+                </div>
+
+                <form asp-action="ReportIssue" method="post" enctype="multipart/form-data" id="issueForm">
+                    <div asp-validation-summary="All" class="alert-danger-apple" style="display: none;"></div>
+
+                    <!-- Issue Title -->
+                    <div class="form-group">
+                        <label asp-for="Issue.Title" class="form-label">
+                            <i class="fas fa-heading me-2"></i>Issue Title *
+                        </label>
+                        <input asp-for="Issue.Title" class="form-control" placeholder="Brief description of the issue" maxlength="100" />
+                        <span asp-validation-for="Issue.Title" class="text-danger"></span>
+                    </div>
+
+                    <!-- Category and Priority Row -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="Issue.Category" class="form-label">
+                                    <i class="fas fa-tags me-2"></i>Category *
+                                </label>
+                                <select asp-for="Issue.Category" class="form-select" asp-items="Html.GetEnumSelectList<CivicLink.Models.IssueCategory>()">
+                                    <option value="">Select a category</option>
+                                </select>
+                                <span asp-validation-for="Issue.Category" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="Issue.Priority" class="form-label">
+                                    <i class="fas fa-exclamation-circle me-2"></i>Priority Level
+                                </label>
+                                <select asp-for="Issue.Priority" class="form-select" asp-items="Html.GetEnumSelectList<CivicLink.Models.IssuePriority>()">
+                                </select>
+                                <span asp-validation-for="Issue.Priority" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Location -->
+                    <div class="form-group">
+                        <label asp-for="Issue.Location" class="form-label">
+                            <i class="fas fa-map-marker-alt me-2"></i>Location *
+                        </label>
+                        <input asp-for="Issue.Location" class="form-control" placeholder="Street address or landmark (e.g., Main Road & Oak Street, Cape Town)" maxlength="200" />
+                        <span asp-validation-for="Issue.Location" class="text-danger"></span>
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle me-1"></i>Be as specific as possible to help us locate the issue quickly
+                        </small>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group">
+                        <label asp-for="Issue.Description" class="form-label">
+                            <i class="fas fa-align-left me-2"></i>Detailed Description *
+                        </label>
+                        <textarea asp-for="Issue.Description" class="form-control" rows="4" placeholder="Provide detailed information about the issue..." maxlength="500"></textarea>
+                        <span asp-validation-for="Issue.Description" class="text-danger"></span>
+                        <div class="d-flex justify-content-between">
+                            <small class="form-text text-muted">
+                                <i class="fas fa-lightbulb me-1"></i>Include what happened, when, and any safety concerns
+                            </small>
+                            <small class="text-muted" id="charCount">0/500 characters</small>
+                        </div>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="glass-card" style="padding: 1.5rem; margin-bottom: 1.5rem; background: rgba(0, 122, 255, 0.05);">
+                        <h5 class="mb-3">
+                            <i class="fas fa-user me-2"></i>Contact Information
+                            <small class="text-muted">(Optional but recommended)</small>
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="Issue.ContactName" class="form-label">Full Name</label>
+                                    <input asp-for="Issue.ContactName" class="form-control" placeholder="Your name" />
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="Issue.ContactEmail" class="form-label">Email Address</label>
+                                    <input asp-for="Issue.ContactEmail" class="form-control" type="email" placeholder="your.email@example.com" />
+                                    <span asp-validation-for="Issue.ContactEmail" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="Issue.ContactPhone" class="form-label">Phone Number</label>
+                                    <input asp-for="Issue.ContactPhone" class="form-control" type="tel" placeholder="021-555-0123" />
+                                    <span asp-validation-for="Issue.ContactPhone" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <small class="text-muted">
+                            <i class="fas fa-shield-alt me-1"></i>Your contact information helps us provide updates and may result in faster resolution
+                        </small>
+                    </div>
+
+                    <!-- File Upload -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-camera me-2"></i>Attachments
+                            <small class="text-muted">(Photos, documents - optional)</small>
+                        </label>
+                        <div class="file-upload-area" onclick="document.getElementById('fileInput').click();">
+                            <i class="fas fa-cloud-upload-alt file-upload-icon"></i>
+                            <div>
+                                <strong>Click to upload files</strong> or drag and drop
+                            </div>
+                            <small class="text-muted">PNG, JPG, PDF up to 10MB each</small>
+                        </div>
+                        <input type="file" id="fileInput" multiple accept=".jpg,.jpeg,.png,.pdf" style="display: none;" />
+                        <div id="fileList" class="mt-2"></div>
+                    </div>
+
+                    <!-- Submit Buttons -->
+                    <div class="d-flex gap-3 mt-4">
+                        <button type="submit" class="btn btn-apple" id="submitBtn">
+                            <i class="fas fa-paper-plane me-2"></i>Submit Issue Report
+                        </button>
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-secondary-apple">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Home
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- User Progress -->
+            <div class="glass-card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
+                <h5 class="mb-3">
+                    <i class="fas fa-user-circle me-2"></i>Your Progress
+                </h5>
+
+                @if (Model?.UserEngagement != null)
+                {
+                    <div class="user-stats" style="margin: 0; padding: 1rem;">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="stat-item">
+                                    <span class="stat-number" style="font-size: 1.5rem;">@Model.UserEngagement.Level</span>
+                                    <span class="stat-label">Level</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-item">
+                                    <span class="stat-number" style="font-size: 1.5rem;">@Model.UserEngagement.Points</span>
+                                    <span class="stat-label">Points</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-item">
+                                    <span class="stat-number" style="font-size: 1.5rem;">@Model.UserEngagement.IssuesReported</span>
+                                    <span class="stat-label">Reports</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Next Level Progress -->
+                    <div class="mt-3">
+                        @{
+                            var nextLevelPoints = (Model.UserEngagement.Level * 150);
+                            var currentProgress = (double)Model.UserEngagement.Points / nextLevelPoints * 100;
+                        }
+                        <div class="d-flex justify-content-between mb-1">
+                            <small>Level @Model.UserEngagement.Level</small>
+                            <small>Level @(Model.UserEngagement.Level + 1)</small>
+                        </div>
+                        <div class="progress" style="height: 6px; background: rgba(255,255,255,0.3); border-radius: 3px;">
+                            <div class="progress-bar" style="background: var(--success-color); width: @Math.Min(currentProgress, 100)%; border-radius: 3px;"></div>
+                        </div>
+                        <small class="text-muted">@(nextLevelPoints - Model.UserEngagement.Points) points to next level</small>
+                    </div>
+                }
+            </div>
+
+            <!-- Badges -->
+            <div class="glass-card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
+                <h5 class="mb-3">
+                    <i class="fas fa-award me-2"></i>Available Badges
+                </h5>
+
+                @if (Model?.AvailableBadges != null)
+                {
+                    foreach (var badge in Model.AvailableBadges.Take(4))
+                    {
+                        var isEarned = Model.UserEngagement?.Badges?.Any(b => b.Type == badge.Type) ?? false;
+                        <div class="badge-item @(isEarned ? "earned" : "")" style="width: 100%; margin-bottom: 0.5rem; justify-content: flex-start;">
+                            <i class="@badge.IconClass badge-icon"></i>
+                            <div class="flex-grow-1">
+                                <div class="fw-bold">@badge.Name</div>
+                                <small class="text-muted">@badge.Description</small>
+                            </div>
+                            @if (isEarned)
+                            {
+                                <i class="fas fa-check text-success"></i>
+                            }
+                        </div>
+                    }
+                }
+            </div>
+
+            <!-- Tips -->
+            <div class="glass-card" style="padding: 1.5rem;">
+                <h5 class="mb-3">
+                    <i class="fas fa-lightbulb me-2"></i>Reporting Tips
+                </h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        <strong>Be specific</strong> about the location
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        <strong>Include photos</strong> when possible
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        <strong>Choose the right priority</strong> level
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        <strong>Provide contact info</strong> for updates
+                    </li>
+                </ul>
+
+                <div class="mt-3 p-2" style="background: rgba(0, 122, 255, 0.1); border-radius: 8px;">
+                    <small>
+                        <i class="fas fa-star text-warning me-1"></i>
+                        <strong>Earn 20-50 points</strong> for each issue you report!
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Character counter for description
+            const descriptionTextarea = document.getElementById('Issue_Description');
+            const charCount = document.getElementById('charCount');
+
+            if (descriptionTextarea && charCount) {
+                descriptionTextarea.addEventListener('input', function () {
+                    const currentLength = this.value.length;
+                    charCount.textContent = currentLength + '/500 characters';
+
+                    if (currentLength > 450) {
+                        charCount.style.color = 'var(--warning-color)';
+                    } else {
+                        charCount.style.color = 'var(--medium-gray)';
+                    }
+                });
+            }
+
+            // File upload handling
+            const fileInput = document.getElementById('fileInput');
+            const fileList = document.getElementById('fileList');
+            const uploadArea = document.querySelector('.file-upload-area');
+
+            fileInput.addEventListener('change', function () {
+                displayFiles(this.files);
+            });
+
+            // Drag and drop functionality
+            uploadArea.addEventListener('dragover', function (e) {
+                e.preventDefault();
+                this.style.borderColor = 'var(--primary-color)';
+                this.style.background = 'rgba(0, 122, 255, 0.1)';
+            });
+
+            uploadArea.addEventListener('dragleave', function (e) {
+                e.preventDefault();
+                this.style.borderColor = 'rgba(142, 142, 147, 0.3)';
+                this.style.background = 'rgba(255, 255, 255, 0.5)';
+            });
+
+            uploadArea.addEventListener('drop', function (e) {
+                e.preventDefault();
+                this.style.borderColor = 'rgba(142, 142, 147, 0.3)';
+                this.style.background = 'rgba(255, 255, 255, 0.5)';
+
+                const files = e.dataTransfer.files;
+                fileInput.files = files;
+                displayFiles(files);
+            });
+
+            function displayFiles(files) {
+                fileList.innerHTML = '';
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'alert alert-info d-flex justify-content-between align-items-center mt-2';
+                    fileItem.innerHTML = `
+                                <div>
+                                    <i class="fas fa-file me-2"></i>
+                                    <span>${file.name}</span>
+                                    <small class="text-muted ms-2">(${(file.size / 1024 / 1024).toFixed(2)} MB)</small>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeFile(${i})">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            `;
+                    fileList.appendChild(fileItem);
+                }
+            }
+
+            // Form validation and submission
+            const form = document.getElementById('issueForm');
+            const submitBtn = document.getElementById('submitBtn');
+
+            form.addEventListener('submit', function (e) {
+                // Add loading state
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<div class="spinner"></div>Submitting...';
+
+                // Form will submit normally, this just provides visual feedback
+            });
+
+            // Real-time validation
+            const requiredFields = form.querySelectorAll('input[required], select[required], textarea[required]');
+            requiredFields.forEach(field => {
+                field.addEventListener('blur', function () {
+                    validateField(this);
+                });
+            });
+
+            function validateField(field) {
+                if (field.value.trim() === '') {
+                    field.classList.add('is-invalid');
+                } else {
+                    field.classList.remove('is-invalid');
+                    field.classList.add('is-valid');
+                }
+            }
+
+            // Show validation summary if there are errors
+            const validationSummary = document.querySelector('[data-valmsg-summary="true"]');
+            if (validationSummary && validationSummary.textContent.trim() !== '') {
+                validationSummary.style.display = 'block';
+            }
+        });
+
+        function removeFile(index) {
+            const fileInput = document.getElementById('fileInput');
+            const dt = new DataTransfer();
+            const files = fileInput.files;
+
+            for (let i = 0; i < files.length; i++) {
+                if (i !== index) {
+                    dt.items.add(files[i]);
+                }
+            }
+
+            fileInput.files = dt.files;
+
+            // Update display
+            const fileList = document.getElementById('fileList');
+            fileList.children[index].remove();
+        }
+    </script>
+}
