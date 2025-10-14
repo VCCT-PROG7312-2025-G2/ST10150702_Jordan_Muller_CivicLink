@@ -6,6 +6,52 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@functions {
+    // Get color for each category to maintain consistency
+    string GetCategoryColor(CivicLink.Models.EventCategory category)
+    {
+        return category switch
+        {
+            CivicLink.Models.EventCategory.CommunityMeeting => "#007AFF",
+            CivicLink.Models.EventCategory.TownHall => "#5856D6",
+            CivicLink.Models.EventCategory.PublicHearing => "#AF52DE",
+            CivicLink.Models.EventCategory.Recreation => "#34C759",
+            CivicLink.Models.EventCategory.Education => "#FF9500",
+            CivicLink.Models.EventCategory.Health => "#FF3B30",
+            CivicLink.Models.EventCategory.Safety => "#FF2D55",
+            CivicLink.Models.EventCategory.Environment => "#30D158",
+            CivicLink.Models.EventCategory.Arts => "#BF5AF2",
+            CivicLink.Models.EventCategory.Sports => "#FF9F0A",
+            CivicLink.Models.EventCategory.Festival => "#FF375F",
+            CivicLink.Models.EventCategory.Workshop => "#5E5CE6",
+            _ => "#8E8E93"
+        };
+    }
+
+    // Get user-friendly category display name
+    string GetCategoryDisplayName(CivicLink.Models.EventCategory category)
+    {
+        return category switch
+        {
+            CivicLink.Models.EventCategory.CommunityMeeting => "Community Meeting",
+            CivicLink.Models.EventCategory.TownHall => "Town Hall",
+            CivicLink.Models.EventCategory.PublicHearing => "Public Hearing",
+            CivicLink.Models.EventCategory.Recreation => "Recreation",
+            CivicLink.Models.EventCategory.Education => "Education",
+            CivicLink.Models.EventCategory.Health => "Health",
+            CivicLink.Models.EventCategory.Safety => "Safety",
+            CivicLink.Models.EventCategory.Environment => "Environment",
+            CivicLink.Models.EventCategory.Arts => "Arts",
+            CivicLink.Models.EventCategory.Sports => "Sports",
+            CivicLink.Models.EventCategory.Festival => "Festival",
+            CivicLink.Models.EventCategory.Workshop => "Workshop",
+            _ => category.ToString()
+        };
+    }
+
+
+}
+
 <div class="event-details-wrapper">
     <!-- Back Button -->
     <a href="@Url.Action("Events")" class="back-link">
@@ -17,14 +63,12 @@
     <div class="event-header-card" style="border-left: 6px solid @GetCategoryColor(Model.Category);">
         <div class="event-badges">
             <span class="event-badge" style="background: @GetCategoryColor(Model.Category); color: white;">
-                @Model.Category.ToString().Replace("CommunityMeeting", "Community Meeting")
-                .Replace("TownHall", "Town Hall")
-                .Replace("PublicHearing", "Public Hearing")
+                @GetCategoryDisplayName(Model.Category)
             </span>
 
             @if (!Model.IsFree)
             {
-                <span class="event-badge" style="background: #34C759; color: white;">R@Model.Cost</span>
+                <span class="event-badge" style="background: #34C759; color: white;">R@Model.Cost.Value.ToString("0.00")</span>
             }
             else
             {
@@ -134,7 +178,6 @@
                     </div>
                 }
 
-               
             </div>
         </div>
     }
@@ -147,28 +190,6 @@
     </div>
 </div>
 
-@functions {
-    // Get color for each category to maintain consistency
-    string GetCategoryColor(CivicLink.Models.EventCategory category)
-    {
-        return category switch
-        {
-            CivicLink.Models.EventCategory.CommunityMeeting => "#007AFF",
-            CivicLink.Models.EventCategory.TownHall => "#5856D6",
-            CivicLink.Models.EventCategory.PublicHearing => "#AF52DE",
-            CivicLink.Models.EventCategory.Recreation => "#34C759",
-            CivicLink.Models.EventCategory.Education => "#FF9500",
-            CivicLink.Models.EventCategory.Health => "#FF3B30",
-            CivicLink.Models.EventCategory.Safety => "#FF2D55",
-            CivicLink.Models.EventCategory.Environment => "#30D158",
-            CivicLink.Models.EventCategory.Arts => "#BF5AF2",
-            CivicLink.Models.EventCategory.Sports => "#FF9F0A",
-            CivicLink.Models.EventCategory.Festival => "#FF375F",
-            CivicLink.Models.EventCategory.Workshop => "#5E5CE6",
-            _ => "#8E8E93"
-        };
-    }
-}
 
 @section Scripts {
     <script>

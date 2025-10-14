@@ -98,9 +98,6 @@ namespace CivicLink.Controllers
             return View();
         }
 
-
-        // POE PART 2 ADDED
-        //==================================================================================================================
         // Display events and announcements page
         public async Task<IActionResult> Events(string searchTerm, EventCategory? category, DateTime? date, string sortBy)
         {
@@ -152,7 +149,6 @@ namespace CivicLink.Controllers
 
             return View(ev);
         }
-        //==================================================================================================================
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

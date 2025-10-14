@@ -1,7 +1,7 @@
 ﻿@* Main dashboard displaying user progress, service options, and community statistics with Apple-inspired design *@
 
 @{
-    ViewBag.Title = "CivicLink - Municipal Services";
+    ViewBag.Title = "Civic Link - Municipal Services";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var userEngagement = ViewBag.UserEngagement as CivicLink.Models.UserEngagement;
 }
@@ -10,11 +10,11 @@
     <!-- Hero Section -->
     <div class="hero-section glass-card">
         <div class="logo-container mb-4">
-            <img src="~/Images/civiclink-high-resolution-logo-transparent.png"
+            <img src="~/Images/Logo_transparent.png"
                  alt="CivicLink Logo"
                  style="height: 80px; max-width: 300px; width: auto; object-fit: contain;" />
         </div>
-        <h1 class="hero-title">CivicLink</h1>
+        <h1 class="hero-title">Civic Link</h1>
         <p class="hero-subtitle">Connecting citizens with municipal services for a better community</p>
 
         @if (userEngagement != null)
