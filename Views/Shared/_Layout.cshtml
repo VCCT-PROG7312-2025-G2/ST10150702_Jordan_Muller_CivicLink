@@ -7,15 +7,39 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/CivicLink.styles.css" asp-append-version="true" />
+    <style>
+        body {
+            background: linear-gradient(135deg, rgba(245, 247, 250, 0.9) 0%, rgba(195, 207, 226, 0.9) 100%), url('@Url.Content("~/Images/particles-opacity-35.png")') center center fixed !important;
+            background-size: cover !important;
+            background-repeat: no-repeat !important;
+            background-attachment: fixed !important;
+        }
+
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: url('@Url.Content("~/Images/particles-opacity-35.png")') center center;
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+                opacity: 0.35;
+                z-index: -2;
+                pointer-events: none;
+            }
+    </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-0">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                    <img src="~/Images/civiclink-high-resolution-logo-transparent.png"
-                         alt="CivicLink"
-                         style="height: 40px; max-width: 160px; width: auto; margin-right: 8px; object-fit: contain;" />
+                    <img src="~/Images/Logo_full.png"
+                         alt="City of Cape Town"
+                         style="height: 40px; max-width: 200px; width: auto; margin-right: 8px; object-fit: contain;" />
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
@@ -27,6 +51,9 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Events">Events</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="IssuesList">All Issues</a>
                         </li>
                         <li class="nav-item">
@@ -36,13 +63,15 @@
                 </div>
             </div>
         </nav>
+        <!-- SA Flag Branding -->
+        <div style="height: 4px; background: linear-gradient(to right, #E03C31 0%, #E03C31 16.66%, #001489 16.66%, #001489 33.33%, #007749 33.33%, #007749 50%, #FFB81C 50%, #FFB81C 66.66%, #000000 66.66%, #000000 83.33%, #FFFFFF 83.33%, #FFFFFF 100%); box-shadow: 0 1px 3px rgba(0,0,0,0.1);"></div>
     </header>
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
-    <!-- Footer removed -->
+    <!-- I dont find a footer is needed in MVC and these projects-->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
