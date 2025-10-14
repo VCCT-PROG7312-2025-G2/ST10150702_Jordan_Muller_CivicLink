@@ -1,4 +1,4 @@
-﻿# <p align="center"> <img id="top" src="wwwroot/Images/Logo_transparent.png" alt="CivicLink Logo" width="300"/> </p>
+﻿# <p align="center"> <img id="top" src="wwwroot/Images/logo_transparent.png" alt="CivicLink Logo" width="100"/> </p>
 
 <h1 align="center">PROG7312 POE - CivicLink</h1>
 <br>
@@ -313,5 +313,6 @@ AI assistance was primarily used for:
 All code was written, understood, and tested by the developer. AI tools served as educational resources similar to documentation and Stack Overflow.
 
 <br>
+
 
 <a href="#top">(Back to Top)</a>
