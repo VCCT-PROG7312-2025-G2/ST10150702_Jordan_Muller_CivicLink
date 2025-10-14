@@ -1,0 +1,313 @@
+﻿@* Local events and announcements display with search, filter, sort, and recommendation features *@
+
+@model CivicLink.Models.EventsViewModel
+@{
+    ViewBag.Title = "Local Events - City of Cape Town";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="events-page-wrapper" style="margin-top: 2rem;">
+    <!-- Page Header with asymmetric design -->
+    <div class="events-header" style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-bottom: 3rem; align-items: end;">
+        <div>
+            <h1 style="font-size: 2.8rem; font-weight: 700; color: #1C1C1E; margin-bottom: 0.5rem; line-height: 1.1;">
+                Discover Local Events
+            </h1>
+            <p style="font-size: 1.1rem; color: #6E6E73; margin: 0;">
+                Stay connected with community happenings across Cape Town
+            </p>
+        </div>
+        <div style="text-align: right;">
+            <span style="display: inline-block; padding: 0.5rem 1rem; background: linear-gradient(135deg, #FFB81C, #FF8C00); color: white; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">
+                @Model.Events.Count Events
+            </span>
+        </div>
+    </div>
+
+    <!-- Search and Filter Bar with modern layout -->
+    <div class="filter-container" style="background: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 20px rgba(0,0,0,0.06);">
+        <form asp-action="Events" method="get" id="searchForm">
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 1rem; align-items: end;">
+
+                <!-- Search Input -->
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.85rem; color: #6E6E73;">Search Events</label>
+                    <input type="text"
+                           name="searchTerm"
+                           value="@Model.SearchTerm"
+                           placeholder="Event name, location, description..."
+                           style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #E5E5EA; border-radius: 10px; font-size: 1rem; transition: all 0.2s;"
+                           onfocus="this.style.borderColor='#007AFF'"
+                           onblur="this.style.borderColor='#E5E5EA'" />
+                </div>
+
+                <!-- Category Filter -->
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.85rem; color: #6E6E73;">Category</label>
+                    <select name="category"
+                            style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #E5E5EA; border-radius: 10px; font-size: 1rem; background: white;">
+                        <option value="">All Categories</option>
+                        @foreach (var cat in Enum.GetValues(typeof(CivicLink.Models.EventCategory)))
+                        {
+                            <option value="@cat" selected="@(Model.FilterCategory?.ToString() == cat.ToString())">
+                                @cat.ToString().Replace("CommunityMeeting", "Community Meeting")
+                                .Replace("TownHall", "Town Hall")
+                                .Replace("PublicHearing", "Public Hearing")
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Date Filter -->
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.85rem; color: #6E6E73;">Date</label>
+                    <input type="date"
+                           name="date"
+                           value="@Model.FilterDate?.ToString("yyyy-MM-dd")"
+                           style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #E5E5EA; border-radius: 10px; font-size: 1rem;" />
+                </div>
+
+                <!-- Search Button -->
+                <div>
+                    <button type="submit"
+                            style="background: linear-gradient(135deg, #007AFF, #0051D5); color: white; border: none; padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);"
+                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0, 122, 255, 0.4)'"
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0, 122, 255, 0.3)'">
+                        <i class="fas fa-search me-2"></i>Search
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sort Options -->
+            <div style="margin-top: 1rem; display: flex; gap: 0.5rem; align-items: center;">
+                <span style="font-size: 0.85rem; font-weight: 600; color: #6E6E73;">Sort by:</span>
+                <button type="submit" name="sortBy" value="date"
+                        style="padding: 0.4rem 1rem; border: 1px solid #E5E5EA; background: white; border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;"
+                        onmouseover="this.style.background='#F5F5F7'"
+                        onmouseout="this.style.background='white'">
+                    Date
+                </button>
+                <button type="submit" name="sortBy" value="name"
+                        style="padding: 0.4rem 1rem; border: 1px solid #E5E5EA; background: white; border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;"
+                        onmouseover="this.style.background='#F5F5F7'"
+                        onmouseout="this.style.background='white'">
+                    Name
+                </button>
+                <button type="submit" name="sortBy" value="category"
+                        style="padding: 0.4rem 1rem; border: 1px solid #E5E5EA; background: white; border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;"
+                        onmouseover="this.style.background='#F5F5F7'"
+                        onmouseout="this.style.background='white'">
+                    Category
+                </button>
+                @if (!string.IsNullOrWhiteSpace(Model.SearchTerm) || Model.FilterCategory.HasValue || Model.FilterDate.HasValue)
+                {
+                    <a href="@Url.Action("Events")"
+                       style="padding: 0.4rem 1rem; border: 1px solid #FF3B30; background: white; color: #FF3B30; border-radius: 20px; font-size: 0.85rem; text-decoration: none; transition: all 0.2s;"
+                       onmouseover="this.style.background='#FF3B30'; this.style.color='white'"
+                       onmouseout="this.style.background='white'; this.style.color='#FF3B30'">
+                        Clear Filters
+                    </a>
+                }
+            </div>
+        </form>
+    </div>
+
+    <!-- Recommendations Section -->
+    @if (Model.RecommendedEvents != null && Model.RecommendedEvents.Count > 0)
+    {
+        <div style="margin-bottom: 3rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                <i class="fas fa-lightbulb" style="color: #FFB81C; font-size: 1.5rem;"></i>
+                <h2 style="font-size: 1.5rem; font-weight: 600; margin: 0;">Recommended For You</h2>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+                @foreach (var recommended in Model.RecommendedEvents.Take(3))
+                {
+                    <div style="background: linear-gradient(135deg, #FFF5E6, #FFFFFF); border-radius: 14px; padding: 1.5rem; border: 2px solid #FFE4B3; transition: all 0.3s;"
+                         onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(255, 184, 28, 0.2)'"
+                         onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                            <span style="background: #FFB81C; color: white; padding: 0.3rem 0.8rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600;">
+                                @recommended.Category.ToString().Replace("CommunityMeeting", "Community")
+                            </span>
+                        </div>
+                        <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; color: #1C1C1E;">
+                            @recommended.Name
+                        </h3>
+                        <p style="font-size: 0.9rem; color: #6E6E73; margin-bottom: 1rem;">
+                            <i class="fas fa-calendar me-1"></i>
+                            @recommended.StartDate.ToString("MMM dd, yyyy")
+                        </p>
+                        <a href="@Url.Action("EventDetails", new { id = recommended.Id })"
+                           style="display: inline-block; color: #FF8C00; font-weight: 600; text-decoration: none; font-size: 0.9rem;"
+                           onmouseover="this.style.textDecoration='underline'"
+                           onmouseout="this.style.textDecoration='none'">
+                            View Details →
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- Events Grid -->
+    <div>
+        <h2 style="font-size: 1.8rem; font-weight: 600; margin-bottom: 1.5rem;">
+            @if (!string.IsNullOrWhiteSpace(Model.SearchTerm) || Model.FilterCategory.HasValue || Model.FilterDate.HasValue)
+            {
+                <span>Search Results</span>
+            }
+            else
+            {
+                <span>Upcoming Events</span>
+            }
+        </h2>
+
+        @if (Model.Events.Any())
+        {
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem;">
+                @foreach (var ev in Model.Events)
+                {
+                    <div style="background: white; border-radius: 16px; overflow: hidden; transition: all 0.3s; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-left: 4px solid @GetCategoryColor(ev.Category);"
+                         onmouseover="this.style.transform='translateY(-6px)'; this.style.boxShadow='0 12px 28px rgba(0,0,0,0.12)'"
+                         onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 12px rgba(0,0,0,0.08)'">
+
+                        <!-- Event Header -->
+                        <div style="padding: 1.5rem; padding-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                                <span style="background: @GetCategoryColor(ev.Category); color: white; padding: 0.4rem 0.9rem; border-radius: 10px; font-size: 0.8rem; font-weight: 600;">
+                                    @ev.Category.ToString().Replace("CommunityMeeting", "Community Meeting")
+                                    .Replace("TownHall", "Town Hall")
+                                    .Replace("PublicHearing", "Public Hearing")
+                                </span>
+                                @if (!ev.IsFree)
+                                {
+                                    <span style="background: #34C759; color: white; padding: 0.4rem 0.9rem; border-radius: 10px; font-size: 0.8rem; font-weight: 600;">
+                                        R@ev.Cost
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span style="background: #E5E5EA; color: #6E6E73; padding: 0.4rem 0.9rem; border-radius: 10px; font-size: 0.8rem; font-weight: 600;">
+                                        FREE
+                                    </span>
+                                }
+                            </div>
+
+                            <h3 style="font-size: 1.3rem; font-weight: 600; margin-bottom: 0.75rem; color: #1C1C1E; line-height: 1.3;">
+                                @ev.Name
+                            </h3>
+
+                            <p style="font-size: 0.95rem; color: #6E6E73; line-height: 1.5; margin-bottom: 1rem;">
+                                @(ev.Description.Length > 120 ? ev.Description.Substring(0, 120) + "..." : ev.Description)
+                            </p>
+
+                            <!-- Event Details -->
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; color: #6E6E73; font-size: 0.9rem;">
+                                    <i class="fas fa-calendar" style="width: 16px;"></i>
+                                    <span>@ev.StartDate.ToString("ddd, MMM dd, yyyy")</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem; color: #6E6E73; font-size: 0.9rem;">
+                                    <i class="fas fa-clock" style="width: 16px;"></i>
+                                    <span>@ev.StartDate.ToString("h:mm tt")</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem; color: #6E6E73; font-size: 0.9rem;">
+                                    <i class="fas fa-map-marker-alt" style="width: 16px;"></i>
+                                    <span>@ev.Location</span>
+                                </div>
+                            </div>
+
+                            <a href="@Url.Action("EventDetails", new { id = ev.Id })"
+                               style="display: block; width: 100%; background: linear-gradient(135deg, #007AFF, #0051D5); color: white; text-align: center; padding: 0.75rem; border-radius: 10px; text-decoration: none; font-weight: 600; transition: all 0.2s;"
+                               onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 4px 12px rgba(0, 122, 255, 0.3)'"
+                               onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+                                View Full Details
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div style="text-align: center; padding: 4rem 2rem; background: white; border-radius: 16px;">
+                <i class="fas fa-calendar-times" style="font-size: 4rem; color: #E5E5EA; margin-bottom: 1rem;"></i>
+                <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem;">No Events Found</h3>
+                <p style="color: #6E6E73; margin-bottom: 1.5rem;">Try adjusting your search criteria or check back later for new events.</p>
+                <a href="@Url.Action("Events")"
+                   style="display: inline-block; background: linear-gradient(135deg, #007AFF, #0051D5); color: white; padding: 0.75rem 2rem; border-radius: 10px; text-decoration: none; font-weight: 600;">
+                    View All Events
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+@functions {
+
+    // Get color based on event category for visual distinction
+    string GetCategoryColor(CivicLink.Models.EventCategory category)
+    {
+        return category switch
+        {
+            CivicLink.Models.EventCategory.CommunityMeeting => "#007AFF",
+            CivicLink.Models.EventCategory.TownHall => "#5856D6",
+            CivicLink.Models.EventCategory.PublicHearing => "#AF52DE",
+            CivicLink.Models.EventCategory.Recreation => "#34C759",
+            CivicLink.Models.EventCategory.Education => "#FF9500",
+            CivicLink.Models.EventCategory.Health => "#FF3B30",
+            CivicLink.Models.EventCategory.Safety => "#FF2D55",
+            CivicLink.Models.EventCategory.Environment => "#30D158",
+            CivicLink.Models.EventCategory.Arts => "#BF5AF2",
+            CivicLink.Models.EventCategory.Sports => "#FF9F0A",
+            CivicLink.Models.EventCategory.Festival => "#FF375F",
+            CivicLink.Models.EventCategory.Workshop => "#5E5CE6",
+            _ => "#8E8E93"
+        };
+    }
+}
+
+@section Scripts {
+    <script>
+        // Add loading state to search button
+        document.getElementById('searchForm').addEventListener('submit', function () {
+            const button = this.querySelector('button[type="submit"]');
+            button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Searching...';
+            button.disabled = true;
+        });
+
+        /*
+        * ============================================
+        * Generated by Claude 2025-01-15
+        * ============================================
+        */
+        // Smooth scroll animations for event cards
+        // I really wanted some nice smooth animations however, I am use to React & Typescript so needed some help to get this working in plain JS
+        // Was quite a nice learning experience 
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }, index * 100);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        // Observe all event cards
+        document.querySelectorAll('.events-page-wrapper > div > div > div').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'all 0.5s ease-out';
+            observer.observe(card);
+        });
+    </script>
+}
