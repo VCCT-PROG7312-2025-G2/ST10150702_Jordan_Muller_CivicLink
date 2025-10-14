@@ -68,6 +68,8 @@
         </div>
     </div>
 
+
+
     <!-- Search and Filter Bar -->
     <div class="filter-container">
         <form asp-action="Events" method="get" id="searchForm">
@@ -88,13 +90,9 @@
                     <label class="filter-label">Category</label>
                     <select name="category" class="filter-select">
                         <option value="">All Categories</option>
-                        @foreach (var cat in Enum.GetValues(typeof(CivicLink.Models.EventCategory)))
+                        @foreach (CivicLink.Models.EventCategory cat in Enum.GetValues(typeof(CivicLink.Models.EventCategory)))
                         {
-                            <option value="@cat" selected="@(Model.FilterCategory?.ToString() == cat.ToString())">
-                                @cat.ToString().Replace("CommunityMeeting", "Community Meeting")
-                                .Replace("TownHall", "Town Hall")
-                                .Replace("PublicHearing", "Public Hearing")
-                            </option>
+                            <option value="@cat" selected="@(Model.FilterCategory == cat)"> @GetCategoryDisplayName(cat) </option>
                         }
                     </select>
                 </div>
