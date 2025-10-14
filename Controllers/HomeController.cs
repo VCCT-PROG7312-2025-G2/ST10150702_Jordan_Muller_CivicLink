@@ -29,31 +29,36 @@ namespace CivicLink.Controllers
             return View();
         }
 
+        // This is the method where the bug was, which was stopping me from accessing the ReportIssue page
         public async Task<IActionResult> ReportIssue()
         {
             var userEngagement = await _gamificationService.GetUserEngagementAsync("demo-user");
             var availableBadges = await _gamificationService.GetAvailableBadgesAsync();
 
-            ViewBag.UserEngagement = userEngagement;
-            ViewBag.AvailableBadges = availableBadges;
+            // Create the view model with Issue and engagement data
+            var viewModel = new ReportIssueViewModel
+            {
+                Issue = new Issue { Priority = IssuePriority.Medium },
+                UserEngagement = userEngagement,
+                AvailableBadges = availableBadges
+            };
 
-            var issue = new Issue { Priority = IssuePriority.Medium };
-            return View(issue);
+            return View(viewModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ReportIssue(Issue issue)
+        public async Task<IActionResult> ReportIssue(ReportIssueViewModel viewModel)
         {
-            if (ModelState.IsValid && issue != null)
+            if (ModelState.IsValid && viewModel?.Issue != null)
             {
                 try
                 {
                     // Create the issue
-                    var issueId = await _issueService.CreateIssueAsync(issue);
+                    var issueId = await _issueService.CreateIssueAsync(viewModel.Issue);
 
                     // Update user engagement
-                    var pointsEarned = CalculatePointsForIssue(issue);
+                    var pointsEarned = CalculatePointsForIssue(viewModel.Issue);
                     var currentEngagement = await _gamificationService.GetUserEngagementAsync("demo-user");
                     var updatedEngagement = await _gamificationService.UpdateUserEngagementAsync(
                         "demo-user", pointsEarned, "issue reported");
@@ -74,7 +79,7 @@ namespace CivicLink.Controllers
             // If we get here, something failed, redisplay form
             ViewBag.UserEngagement = await _gamificationService.GetUserEngagementAsync("demo-user");
             ViewBag.AvailableBadges = await _gamificationService.GetAvailableBadgesAsync();
-            return View(issue ?? new Issue { Priority = IssuePriority.Medium });
+            return View(viewModel);
         }
 
         public async Task<IActionResult> IssuesList()
