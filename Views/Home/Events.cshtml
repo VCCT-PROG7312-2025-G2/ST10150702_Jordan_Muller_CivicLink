@@ -6,46 +6,37 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="events-page-wrapper" style="margin-top: 2rem;">
-    <!-- Page Header with asymmetric design -->
-    <div class="events-header" style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-bottom: 3rem; align-items: end;">
+<div class="events-page-wrapper">
+    <!-- Page Header -->
+    <div class="events-header">
         <div>
-            <h1 style="font-size: 2.8rem; font-weight: 700; color: #1C1C1E; margin-bottom: 0.5rem; line-height: 1.1;">
-                Discover Local Events
-            </h1>
-            <p style="font-size: 1.1rem; color: #6E6E73; margin: 0;">
-                Stay connected with community happenings across Cape Town
-            </p>
+            <h1>Discover Local Events</h1>
+            <p>Stay connected with community happenings across Cape Town</p>
         </div>
         <div style="text-align: right;">
-            <span style="display: inline-block; padding: 0.5rem 1rem; background: linear-gradient(135deg, #FFB81C, #FF8C00); color: white; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">
-                @Model.Events.Count Events
-            </span>
+            <span class="events-count-badge">@Model.Events.Count Events</span>
         </div>
     </div>
 
-    <!-- Search and Filter Bar with modern layout -->
-    <div class="filter-container" style="background: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 20px rgba(0,0,0,0.06);">
+    <!-- Search and Filter Bar -->
+    <div class="filter-container">
         <form asp-action="Events" method="get" id="searchForm">
-            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 1rem; align-items: end;">
+            <div class="filter-grid">
 
                 <!-- Search Input -->
                 <div>
-                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.85rem; color: #6E6E73;">Search Events</label>
+                    <label class="filter-label">Search Events</label>
                     <input type="text"
                            name="searchTerm"
                            value="@Model.SearchTerm"
                            placeholder="Event name, location, description..."
-                           style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #E5E5EA; border-radius: 10px; font-size: 1rem; transition: all 0.2s;"
-                           onfocus="this.style.borderColor='#007AFF'"
-                           onblur="this.style.borderColor='#E5E5EA'" />
+                           class="filter-input" />
                 </div>
 
                 <!-- Category Filter -->
                 <div>
-                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.85rem; color: #6E6E73;">Category</label>
-                    <select name="category"
-                            style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #E5E5EA; border-radius: 10px; font-size: 1rem; background: white;">
+                    <label class="filter-label">Category</label>
+                    <select name="category" class="filter-select">
                         <option value="">All Categories</option>
                         @foreach (var cat in Enum.GetValues(typeof(CivicLink.Models.EventCategory)))
                         {
@@ -60,53 +51,31 @@
 
                 <!-- Date Filter -->
                 <div>
-                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.85rem; color: #6E6E73;">Date</label>
+                    <label class="filter-label">Date</label>
                     <input type="date"
                            name="date"
                            value="@Model.FilterDate?.ToString("yyyy-MM-dd")"
-                           style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #E5E5EA; border-radius: 10px; font-size: 1rem;" />
+                           class="filter-date" />
                 </div>
 
                 <!-- Search Button -->
                 <div>
-                    <button type="submit"
-                            style="background: linear-gradient(135deg, #007AFF, #0051D5); color: white; border: none; padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);"
-                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0, 122, 255, 0.4)'"
-                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0, 122, 255, 0.3)'">
+                    <button type="submit" class="search-btn">
                         <i class="fas fa-search me-2"></i>Search
                     </button>
                 </div>
             </div>
 
             <!-- Sort Options -->
-            <div style="margin-top: 1rem; display: flex; gap: 0.5rem; align-items: center;">
-                <span style="font-size: 0.85rem; font-weight: 600; color: #6E6E73;">Sort by:</span>
-                <button type="submit" name="sortBy" value="date"
-                        style="padding: 0.4rem 1rem; border: 1px solid #E5E5EA; background: white; border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;"
-                        onmouseover="this.style.background='#F5F5F7'"
-                        onmouseout="this.style.background='white'">
-                    Date
-                </button>
-                <button type="submit" name="sortBy" value="name"
-                        style="padding: 0.4rem 1rem; border: 1px solid #E5E5EA; background: white; border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;"
-                        onmouseover="this.style.background='#F5F5F7'"
-                        onmouseout="this.style.background='white'">
-                    Name
-                </button>
-                <button type="submit" name="sortBy" value="category"
-                        style="padding: 0.4rem 1rem; border: 1px solid #E5E5EA; background: white; border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;"
-                        onmouseover="this.style.background='#F5F5F7'"
-                        onmouseout="this.style.background='white'">
-                    Category
-                </button>
+            <div class="sort-container">
+                <span class="sort-label">Sort by:</span>
+                <button type="submit" name="sortBy" value="date" class="sort-btn">Date</button>
+                <button type="submit" name="sortBy" value="name" class="sort-btn">Name</button>
+                <button type="submit" name="sortBy" value="category" class="sort-btn">Category</button>
+
                 @if (!string.IsNullOrWhiteSpace(Model.SearchTerm) || Model.FilterCategory.HasValue || Model.FilterDate.HasValue)
                 {
-                    <a href="@Url.Action("Events")"
-                       style="padding: 0.4rem 1rem; border: 1px solid #FF3B30; background: white; color: #FF3B30; border-radius: 20px; font-size: 0.85rem; text-decoration: none; transition: all 0.2s;"
-                       onmouseover="this.style.background='#FF3B30'; this.style.color='white'"
-                       onmouseout="this.style.background='white'; this.style.color='#FF3B30'">
-                        Clear Filters
-                    </a>
+                    <a href="@Url.Action("Events")" class="clear-filters-btn">Clear Filters</a>
                 }
             </div>
         </form>
@@ -115,33 +84,24 @@
     <!-- Recommendations Section -->
     @if (Model.RecommendedEvents != null && Model.RecommendedEvents.Count > 0)
     {
-        <div style="margin-bottom: 3rem;">
-            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
-                <i class="fas fa-lightbulb" style="color: #FFB81C; font-size: 1.5rem;"></i>
-                <h2 style="font-size: 1.5rem; font-weight: 600; margin: 0;">Recommended For You</h2>
+        <div class="recommendations-section">
+            <div class="recommendations-header">
+                <i class="fas fa-lightbulb"></i>
+                <h2>Recommended For You</h2>
             </div>
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+            <div class="recommendations-grid">
                 @foreach (var recommended in Model.RecommendedEvents.Take(3))
                 {
-                    <div style="background: linear-gradient(135deg, #FFF5E6, #FFFFFF); border-radius: 14px; padding: 1.5rem; border: 2px solid #FFE4B3; transition: all 0.3s;"
-                         onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(255, 184, 28, 0.2)'"
-                         onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                            <span style="background: #FFB81C; color: white; padding: 0.3rem 0.8rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600;">
-                                @recommended.Category.ToString().Replace("CommunityMeeting", "Community")
-                            </span>
-                        </div>
-                        <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; color: #1C1C1E;">
-                            @recommended.Name
-                        </h3>
-                        <p style="font-size: 0.9rem; color: #6E6E73; margin-bottom: 1rem;">
+                    <div class="recommendation-card">
+                        <span class="recommendation-badge">
+                            @recommended.Category.ToString().Replace("CommunityMeeting", "Community")
+                        </span>
+                        <h3 class="recommendation-title">@recommended.Name</h3>
+                        <p class="recommendation-date">
                             <i class="fas fa-calendar me-1"></i>
                             @recommended.StartDate.ToString("MMM dd, yyyy")
                         </p>
-                        <a href="@Url.Action("EventDetails", new { id = recommended.Id })"
-                           style="display: inline-block; color: #FF8C00; font-weight: 600; text-decoration: none; font-size: 0.9rem;"
-                           onmouseover="this.style.textDecoration='underline'"
-                           onmouseout="this.style.textDecoration='none'">
+                        <a href="@Url.Action("EventDetails", new { id = recommended.Id })" class="recommendation-link">
                             View Details →
                         </a>
                     </div>
@@ -165,63 +125,56 @@
 
         @if (Model.Events.Any())
         {
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem;">
+            <div class="events-grid">
                 @foreach (var ev in Model.Events)
                 {
-                    <div style="background: white; border-radius: 16px; overflow: hidden; transition: all 0.3s; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-left: 4px solid @GetCategoryColor(ev.Category);"
-                         onmouseover="this.style.transform='translateY(-6px)'; this.style.boxShadow='0 12px 28px rgba(0,0,0,0.12)'"
-                         onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 12px rgba(0,0,0,0.08)'">
+                    <div class="event-card" style="border-left: 4px solid @GetCategoryColor(ev.Category);">
+                        <div class="event-card-content">
 
-                        <!-- Event Header -->
-                        <div style="padding: 1.5rem; padding-bottom: 1rem;">
-                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                                <span style="background: @GetCategoryColor(ev.Category); color: white; padding: 0.4rem 0.9rem; border-radius: 10px; font-size: 0.8rem; font-weight: 600;">
+                            <!-- Event Header -->
+                            <div class="event-card-header">
+                                <span class="event-category-badge" style="background: @GetCategoryColor(ev.Category);">
                                     @ev.Category.ToString().Replace("CommunityMeeting", "Community Meeting")
                                     .Replace("TownHall", "Town Hall")
                                     .Replace("PublicHearing", "Public Hearing")
                                 </span>
+
                                 @if (!ev.IsFree)
                                 {
-                                    <span style="background: #34C759; color: white; padding: 0.4rem 0.9rem; border-radius: 10px; font-size: 0.8rem; font-weight: 600;">
-                                        R@ev.Cost
-                                    </span>
+                                    <span class="event-price-badge event-price-paid">R@ev.Cost</span>
                                 }
                                 else
                                 {
-                                    <span style="background: #E5E5EA; color: #6E6E73; padding: 0.4rem 0.9rem; border-radius: 10px; font-size: 0.8rem; font-weight: 600;">
-                                        FREE
-                                    </span>
+                                    <span class="event-price-badge event-price-free">FREE</span>
                                 }
                             </div>
 
-                            <h3 style="font-size: 1.3rem; font-weight: 600; margin-bottom: 0.75rem; color: #1C1C1E; line-height: 1.3;">
-                                @ev.Name
-                            </h3>
+                            <!-- Event Title -->
+                            <h3 class="event-title">@ev.Name</h3>
 
-                            <p style="font-size: 0.95rem; color: #6E6E73; line-height: 1.5; margin-bottom: 1rem;">
+                            <!-- Event Description -->
+                            <p class="event-description">
                                 @(ev.Description.Length > 120 ? ev.Description.Substring(0, 120) + "..." : ev.Description)
                             </p>
 
                             <!-- Event Details -->
-                            <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;">
-                                <div style="display: flex; align-items: center; gap: 0.5rem; color: #6E6E73; font-size: 0.9rem;">
-                                    <i class="fas fa-calendar" style="width: 16px;"></i>
+                            <div class="event-details">
+                                <div class="event-detail-item">
+                                    <i class="fas fa-calendar event-detail-icon"></i>
                                     <span>@ev.StartDate.ToString("ddd, MMM dd, yyyy")</span>
                                 </div>
-                                <div style="display: flex; align-items: center; gap: 0.5rem; color: #6E6E73; font-size: 0.9rem;">
-                                    <i class="fas fa-clock" style="width: 16px;"></i>
+                                <div class="event-detail-item">
+                                    <i class="fas fa-clock event-detail-icon"></i>
                                     <span>@ev.StartDate.ToString("h:mm tt")</span>
                                 </div>
-                                <div style="display: flex; align-items: center; gap: 0.5rem; color: #6E6E73; font-size: 0.9rem;">
-                                    <i class="fas fa-map-marker-alt" style="width: 16px;"></i>
+                                <div class="event-detail-item">
+                                    <i class="fas fa-map-marker-alt event-detail-icon"></i>
                                     <span>@ev.Location</span>
                                 </div>
                             </div>
 
-                            <a href="@Url.Action("EventDetails", new { id = ev.Id })"
-                               style="display: block; width: 100%; background: linear-gradient(135deg, #007AFF, #0051D5); color: white; text-align: center; padding: 0.75rem; border-radius: 10px; text-decoration: none; font-weight: 600; transition: all 0.2s;"
-                               onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 4px 12px rgba(0, 122, 255, 0.3)'"
-                               onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+                            <!-- View Button -->
+                            <a href="@Url.Action("EventDetails", new { id = ev.Id })" class="event-view-btn">
                                 View Full Details
                             </a>
                         </div>
@@ -231,20 +184,22 @@
         }
         else
         {
-            <div style="text-align: center; padding: 4rem 2rem; background: white; border-radius: 16px;">
-                <i class="fas fa-calendar-times" style="font-size: 4rem; color: #E5E5EA; margin-bottom: 1rem;"></i>
-                <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem;">No Events Found</h3>
-                <p style="color: #6E6E73; margin-bottom: 1.5rem;">Try adjusting your search criteria or check back later for new events.</p>
-                <a href="@Url.Action("Events")"
-                   style="display: inline-block; background: linear-gradient(135deg, #007AFF, #0051D5); color: white; padding: 0.75rem 2rem; border-radius: 10px; text-decoration: none; font-weight: 600;">
-                    View All Events
-                </a>
+            <div class="no-events-container">
+                <i class="fas fa-calendar-times no-events-icon"></i>
+                <h3 class="no-events-title">No Events Found</h3>
+                <p class="no-events-text">Try adjusting your search criteria or check back later for new events.</p>
+                <a href="@Url.Action("Events")" class="no-events-btn">View All Events</a>
             </div>
         }
     </div>
 </div>
 
 @functions {
+    /*
+     * ============================================
+     * Generated by Claude 2025-01-15
+     * ============================================
+     */
 
     // Get color based on event category for visual distinction
     string GetCategoryColor(CivicLink.Models.EventCategory category)
