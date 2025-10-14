@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<IIssueService, IssueService>();
 builder.Services.AddSingleton<IGamificationService, GamificationService>();
+builder.Services.AddSingleton<IEventService, EventService>();
 
 var app = builder.Build();
 

@@ -1,9 +1,9 @@
+// Main controller handling issue reporting, dashboard display, and user interaction with no business logic
 using CivicLink.Models;
 using CivicLink.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-// Main controller handling issue reporting, dashboard display, and user interaction with no business logic
 namespace CivicLink.Controllers
 {
     public class HomeController : Controller
@@ -11,12 +11,14 @@ namespace CivicLink.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IIssueService _issueService;
         private readonly IGamificationService _gamificationService;
+        private readonly IEventService _eventService;
 
-        public HomeController(ILogger<HomeController> logger, IIssueService issueService, IGamificationService gamificationService)
+        public HomeController(ILogger<HomeController> logger, IIssueService issueService, IGamificationService gamificationService, IEventService eventService)
         {
             _logger = logger;
             _issueService = issueService;
             _gamificationService = gamificationService;
+            _eventService = eventService;
         }
 
         public async Task<IActionResult> Index()
@@ -32,40 +34,33 @@ namespace CivicLink.Controllers
             var userEngagement = await _gamificationService.GetUserEngagementAsync("demo-user");
             var availableBadges = await _gamificationService.GetAvailableBadgesAsync();
 
-            var viewModel = new ReportIssueViewModel
-            {
-                Issue = new Issue { Priority = IssuePriority.Medium },
-                UserEngagement = userEngagement,
-                AvailableBadges = availableBadges
-            };
+            ViewBag.UserEngagement = userEngagement;
+            ViewBag.AvailableBadges = availableBadges;
 
-            return View(viewModel);
+            var issue = new Issue { Priority = IssuePriority.Medium };
+            return View(issue);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ReportIssue(ReportIssueViewModel model)
+        public async Task<IActionResult> ReportIssue(Issue issue)
         {
-            // Only validate the Issue part of the model
-            ModelState.Remove("UserEngagement");
-            ModelState.Remove("AvailableBadges");
-            ModelState.Remove("SuccessMessage");
-
-            if (ModelState.IsValid && model.Issue != null)
+            if (ModelState.IsValid && issue != null)
             {
                 try
                 {
                     // Create the issue
-                    var issueId = await _issueService.CreateIssueAsync(model.Issue);
+                    var issueId = await _issueService.CreateIssueAsync(issue);
 
                     // Update user engagement
-                    var pointsEarned = CalculatePointsForIssue(model.Issue);
+                    var pointsEarned = CalculatePointsForIssue(issue);
+                    var currentEngagement = await _gamificationService.GetUserEngagementAsync("demo-user");
                     var updatedEngagement = await _gamificationService.UpdateUserEngagementAsync(
                         "demo-user", pointsEarned, "issue reported");
 
                     // Set success message
                     TempData["SuccessMessage"] = $"Issue reported successfully! Issue ID: {issueId}. You earned {pointsEarned} points!";
-                    TempData["ShowBadges"] = updatedEngagement.Badges.Count > (model.UserEngagement?.Badges.Count ?? 0);
+                    TempData["ShowBadges"] = updatedEngagement.Badges.Count > currentEngagement.Badges.Count;
 
                     return RedirectToAction(nameof(ReportIssue));
                 }
@@ -77,9 +72,9 @@ namespace CivicLink.Controllers
             }
 
             // If we get here, something failed, redisplay form
-            model.UserEngagement = await _gamificationService.GetUserEngagementAsync("demo-user");
-            model.AvailableBadges = await _gamificationService.GetAvailableBadgesAsync();
-            return View(model);
+            ViewBag.UserEngagement = await _gamificationService.GetUserEngagementAsync("demo-user");
+            ViewBag.AvailableBadges = await _gamificationService.GetAvailableBadgesAsync();
+            return View(issue ?? new Issue { Priority = IssuePriority.Medium });
         }
 
         public async Task<IActionResult> IssuesList()
@@ -102,6 +97,62 @@ namespace CivicLink.Controllers
         {
             return View();
         }
+
+
+        // POE PART 2 ADDED
+        //==================================================================================================================
+        // Display events and announcements page
+        public async Task<IActionResult> Events(string searchTerm, EventCategory? category, DateTime? date, string sortBy)
+        {
+            // Track the search for recommendations
+            if (!string.IsNullOrWhiteSpace(searchTerm) || category.HasValue || date.HasValue)
+            {
+                _eventService.TrackSearch(searchTerm, category, date);
+            }
+
+            // Get filtered events
+            var events = await _eventService.SearchEventsAsync(searchTerm, category, date);
+
+            // Apply sorting
+            events = sortBy switch
+            {
+                "name" => events.OrderBy(e => e.Name).ToList(),
+                "category" => events.OrderBy(e => e.Category).ToList(),
+                "date" => events.OrderBy(e => e.StartDate).ToList(),
+                _ => events.OrderBy(e => e.StartDate).ToList()
+            };
+
+            // Build view model
+            var viewModel = new EventsViewModel
+            {
+                Events = events,
+                AvailableCategories = await _eventService.GetActiveCategoriesAsync(),
+                EventDates = await _eventService.GetEventDatesAsync(),
+                RecommendedEvents = new Queue<Event>(await _eventService.GetRecommendedEventsAsync()),
+                SearchTerm = searchTerm,
+                FilterCategory = category,
+                FilterDate = date
+            };
+
+            return View(viewModel);
+        }
+
+        // View single event details
+        public async Task<IActionResult> EventDetails(int id)
+        {
+            var ev = await _eventService.GetEventByIdAsync(id);
+
+            if (ev == null)
+            {
+                return NotFound();
+            }
+
+            // Record that user viewed this event
+            await _eventService.RecordEventViewAsync(ev);
+
+            return View(ev);
+        }
+        //==================================================================================================================
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

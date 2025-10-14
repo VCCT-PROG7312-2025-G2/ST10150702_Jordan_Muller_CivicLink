@@ -30,7 +30,10 @@ namespace CivicLink.Models
 
         public DateTime? UpdatedAt { get; set; }
 
-        public List<string> AttachmentPaths { get; set; } = new List<string>();
+        // I found this wasnt actually working the way I wanted it to from part 1 and thus changed it to the active code below
+        // public List<string> AttachmentPaths { get; set; } = new List<string>();
+        public Queue<string> AttachmentPaths { get; set; } = new Queue<string>();
+
 
         public string ContactName { get; set; }
 
