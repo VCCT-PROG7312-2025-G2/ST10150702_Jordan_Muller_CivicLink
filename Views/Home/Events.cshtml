@@ -6,6 +6,13 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@*
+
+So these two functions below are used quite a lot, so in the future I could move them to a helper class
+as they are used in both Events.cshtml and EventDetails.cshtml however as there are only 2 methods I will leave them here for now.
+
+*@
+
 @functions {
     /*
      * ============================================
@@ -13,6 +20,7 @@
      * ============================================
      */
 
+    // I started writing out these one by one, however going back and forth from a site with colour hex codes, its faster if Claude does it
     // Get color based on event category for visual distinction
     string GetCategoryColor(CivicLink.Models.EventCategory category)
     {
@@ -187,7 +195,7 @@
 
                                 @if (!ev.IsFree)
                                 {
-                                    <span class="event-price-badge event-price-paid">R@ev.Cost.Value.ToString("0.00")</span>
+                                    <span class="event-price-badge event-price-paid">R@(ev.Cost.Value.ToString("0.00"))</span>
                                 }
                                 else
                                 {

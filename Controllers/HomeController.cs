@@ -1,9 +1,14 @@
-// Main controller handling issue reporting, dashboard display, and user interaction with no business logic
 using CivicLink.Models;
 using CivicLink.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
+
+/*
+ * I use to include almost all my business logic to my MVC home controller, which I now know is bad practice
+ * I still found myself doing that here, but I have moved a lot of the logic to the services layer now
+ * Im still not 100% sure if this is the best way to do it, but its better than before
+*/
 namespace CivicLink.Controllers
 {
     public class HomeController : Controller

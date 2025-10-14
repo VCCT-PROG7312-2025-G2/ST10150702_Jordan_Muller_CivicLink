@@ -9,6 +9,9 @@ namespace CivicLink.Models
      * for event details, categorization, and date management.
      */
 
+
+    // At this point in my studies, ive created a model page this like hundres of times so its second nature at this point
+    // I still would like to learn more about data annotations and validation attributes though.
     public class Event
     {
         // Unique ID
@@ -66,6 +69,8 @@ namespace CivicLink.Models
     }
 
     // Types of community events
+    // I made this enum to categorize events, which will help in filtering and searching.
+    // I never use to use enums, as I was quite unfamiliar with them, but now I see their value.
     public enum EventCategory
     {
         CommunityMeeting,
@@ -84,6 +89,7 @@ namespace CivicLink.Models
     }
 
     // Announcements which are different from events
+    // I know I could have put this in a separate file, but I wanted to keep related models together for easier management.
     public class Announcement
     {
         // Classic unique ID

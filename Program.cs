@@ -2,7 +2,7 @@ using CivicLink.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Added my services to the container here
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<IIssueService, IssueService>();
 builder.Services.AddSingleton<IGamificationService, GamificationService>();

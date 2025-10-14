@@ -234,6 +234,8 @@ namespace CivicLink.Services
         {
             var sampleEvents = new[]
             {
+                // I was wondering if this was the best way of adding sample events, but it seems to work fine.
+                // Was a bit stuck when creating event items what to include.
                 new Event
                 {
                     Id = nextId++,

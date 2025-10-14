@@ -5,8 +5,15 @@
     ViewBag.Title = Model.Name + " - City of Cape Town";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+     
+@* 
 
+So these two functions below are used quite a lot, so in the future I could move them to a helper class
+as they are used in both Events.cshtml and EventDetails.cshtml however as there are only 2 methods I will leave them here for now.
+
+*@
 @functions {
+    // COPIED FROM Events.cshtml (MADE BY CLAUDE AI)
     // Get color for each category to maintain consistency
     string GetCategoryColor(CivicLink.Models.EventCategory category)
     {
@@ -68,7 +75,7 @@
 
             @if (!Model.IsFree)
             {
-                <span class="event-badge" style="background: #34C759; color: white;">R@Model.Cost.Value.ToString("0.00")</span>
+                <span class="event-badge" style="background: #34C759; color: white;">R@(Model.Cost.Value.ToString("0.00"))</span>
             }
             else
             {
