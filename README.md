@@ -1,9 +1,9 @@
-﻿# <p align="center"> <img id="top" src="wwwroot/Images/civiclink-high-resolution-logo-transparent.png" alt="CivicLink Logo" width="300"/> </p>
+﻿# <p align="center"> <img id="top" src="wwwroot/Images/Logo_transparent.png" alt="CivicLink Logo" width="300"/> </p>
 
 <h1 align="center">PROG7312 POE - CivicLink</h1>
 <br>
 <h2 align="center">About this Project</h2>
-<p align="center">CivicLink is a comprehensive municipal services application designed to bridge the gap between citizens and their local government. Built with the goal of improving community engagement and service delivery, CivicLink allows residents to report issues, track service requests, and stay informed about local events. The application features an elegant Apple-inspired design with gamification elements to encourage active civic participation. Through innovative data structures and a user-friendly interface, citizens can easily contribute to making their communities better while earning rewards for their engagement.</p>
+<p align="center">CivicLink is a comprehensive municipal services application designed to bridge the gap between citizens and their local government. Built with the goal of improving community engagement and service delivery, CivicLink allows residents to report issues, stay informed about local events and announcements, and track service requests. The application features an elegant Apple-inspired design with gamification elements to encourage active civic participation. Through innovative data structures and a user-friendly interface, citizens can easily contribute to making their communities better while earning rewards for their engagement.</p>
 <br><br>
 <p align="center">
   <strong>Jordan Muller | ST10150702</strong>
@@ -92,11 +92,13 @@ CivicLink/
 
 ## Usage
 
-This application is designed for municipal residents who want to actively participate in improving their communities. The system provides a streamlined way to report issues, track progress, and engage with local government services.
+This application is designed for municipal residents who want to actively participate in improving their communities. The system provides a streamlined way to report issues, discover local events, track progress, and engage with local government services.
 
 <div align="center">
 This Application has the following Features:<br>
   <img src="https://img.shields.io/badge/Issue%20Reporting-blue?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Local%20Events-cyan?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Event%20Recommendations-teal?style=for-the-badge" />
   <img src="https://img.shields.io/badge/Gamification%20System-green?style=for-the-badge" />
   <img src="https://img.shields.io/badge/Progress%20Tracking-orange?style=for-the-badge" />
   <img src="https://img.shields.io/badge/Apple%20Design-purple?style=for-the-badge" />
@@ -105,12 +107,12 @@ This Application has the following Features:<br>
 </div>
 <br>
 
-Users can report various types of municipal issues, earn points and badges for community participation, and track the status of their submissions in real-time.
+Users can report various types of municipal issues, discover upcoming community events, earn points and badges for participation, and track the status of their submissions in real-time.
 
 ### Screenshots
 
 <!-- Home Page -->
-|  <img src="wwwroot/Images/Home_Page.png" alt="home image"> | **Home Page**<br>The **Home Page** welcomes users with an elegant Apple-inspired design featuring the CivicLink logo, user engagement statistics, and easy access to municipal services. Users can see their current level, points earned, and badges unlocked. The page displays community statistics and provides quick actions to report issues or view all submissions. |
+|  <img src="wwwroot/Images/Home_Page.png" alt="home image"> | **Home Page**<br>The **Home Page** welcomes users with an elegant Apple-inspired design featuring the CivicLink logo, user engagement statistics, and easy access to municipal services. Users can see their current level, points earned, and badges unlocked. The page displays community statistics and provides quick actions to report issues, view local events, or check all submissions. |
 |---|---|
 
 <!-- Report Issue Page -->
@@ -125,6 +127,14 @@ Users can report various types of municipal issues, earn points and badges for c
 | **Issue Details Page**<br>The **Issue Details Page** provides comprehensive information about a specific issue, including a status timeline, contact information, location details, and any attached files. Users can share issues, report updates, and follow issues for notifications. The page features a clean timeline showing the progress from submission to resolution. |  <img src="wwwroot/Images/Inspect_Issue.png" alt="Inspect image"> |
 |---|---|
 
+<!-- Local Events Page -->
+|  <img src="wwwroot/Images/Local_Events.png" alt="Local Events image"> | **Local Events & Announcements**<br>The **Local Events Page** displays all upcoming community events, town halls, and municipal announcements. Users can search and filter events by category, date, and location. The page features personalized event recommendations based on user search patterns, with each event card displaying key information including date, time, location, and cost. Advanced data structures power the efficient search and recommendation algorithms. |
+|---|---|
+
+<!-- Event Details Page -->
+| **Event Details Page**<br>The **Event Details Page** provides comprehensive information about a specific event including full description, date and time, location details, and contact information. Users can view all event details in an elegant layout with clear visual hierarchy. The page tracks recently viewed events and helps users discover related community happenings. |  <img src="wwwroot/Images/View_Event.png" alt="View Event image"> |
+|---|---|
+
 <br>
 <a href="#top">(Back to Top)</a>
 
@@ -133,42 +143,60 @@ Users can report various types of municipal issues, earn points and badges for c
 ## Technical Architecture
 
 ### Custom Data Structures
+
+**Part 1 - Issue Reporting:**
 - **LinkedList Implementation**: Stores issues without using primitive arrays
 - **Priority Queue**: Manages issues by priority level using heap structure  
 - **Activity Stack**: Tracks recent user activities and system events
+
+**Part 2 - Local Events & Announcements:**
+- **SortedDictionary**: Stores events with efficient lookup and sorting by date
+- **Search Pattern Tracker**: Dictionary-based tracking of user search behavior for recommendations
+- **Recently Viewed Stack**: Stack implementation for tracking recently viewed events
+- **Category Manager**: HashSet for managing unique event categories
+- **Queue for Recommendations**: Queue structure for personalized event suggestions
+
+**Architecture Principles:**
 - **No Business Logic in Controllers**: Clean MVC separation with service layer
+- **Service-Oriented Design**: IssueService, EventService, and GamificationService
+- **Dependency Injection**: Proper service registration and lifecycle management
 
 ### Key Features
 - **Apple-inspired UI**: Modern, elegant design with smooth animations
 - **Gamification System**: Points, levels, and badges to encourage participation
+- **Event Recommendation Engine**: Personalized suggestions based on search patterns
+- **Advanced Search & Filtering**: Multi-criteria filtering for both issues and events
 - **Responsive Design**: Works seamlessly on desktop and mobile devices
 - **File Upload Support**: Attach photos and documents to issue reports
-- **Advanced Filtering**: Search and filter issues by multiple criteria
 - **Status Tracking**: Real-time updates on issue resolution progress
+- **Event Discovery**: Browse, search, and filter upcoming community events
 
 <br><br>
 
 ## Roadmap
 
-While our application is fully functional with core features implemented, we have plans for future enhancements:
-
-- ✅ **Part 1 - Issue Reporting**
+- ✅ **Part 1 - Issue Reporting** (Complete)
   - ✅ Complete issue submission system
   - ✅ Category and priority management
   - ✅ File attachment support
   - ✅ Gamification with points and badges
   - ✅ Apple-inspired UI design
-  - ✅ Custom data structures implementation
+  - ✅ Custom data structures (LinkedList, Priority Queue, Stack)
 
-- ⬜ **Part 2 - Local Events & Announcements** (Future)
-  - ⬜ Local Events and Announcements
-  - ⬜ Upcoming Events
-  - ⬜ Advanced Data Structures
-  - ⬜ Database Creation
+- ✅ **Part 2 - Local Events & Announcements** (Complete)
+  - ✅ Local Events browsing and discovery
+  - ✅ Upcoming Events display with detailed information
+  - ✅ Advanced Search and Filter functionality
+  - ✅ Event Recommendations based on user behavior
+  - ✅ Advanced Data Structures (SortedDictionary, HashSet, Queue, Stack)
+  - ✅ Search Pattern Tracking algorithm
 
-- ⬜ **Part 3 - Service Request Status Page** (Future)
-  - ⬜ All Pages Active and Working
-  - ⬜ Database Full Usage Across Site
+- ⬜ **Part 3 - Service Request Status** (Future)
+  - ⬜ Service Request tracking dashboard
+  - ⬜ Real-time status updates
+  - ⬜ Database integration for persistent storage
+  - ⬜ User authentication and profiles
+  - ⬜ Complete end-to-end municipal services platform
 
 
 <br>
@@ -179,20 +207,36 @@ While our application is fully functional with core features implemented, we hav
 ## Code Architecture
 
 ### Models
+**Issue Reporting:**
 - **Issue**: Core issue entity with validation
 - **UserEngagement**: Gamification tracking
 - **Badge**: Achievement system
+- **ReportIssueViewModel**: View model for issue reporting
 - **Enums**: IssueCategory, IssuePriority, IssueStatus, BadgeType
 
+**Events & Announcements:**
+- **Event**: Core event entity with detailed information
+- **EventsViewModel**: View model for events listing with filters
+- **Enums**: EventCategory (CommunityMeeting, TownHall, PublicHearing, Recreation, Education, Health, Safety, Environment, Arts, Sports, Festival, Workshop)
+
 ### Services  
-- **IssueService**: Issue management using custom data structures
+- **IssueService**: Issue management using custom linked list and priority queue
+- **EventService**: Event management with search, filtering, and recommendation algorithms
 - **GamificationService**: User engagement and badge system
 - **Dependency Injection**: Clean service registration and lifecycle management
 
 ### Data Structures
+
+**Part 1 - Issue Data Structures:**
 - **IssueLinkedList**: Custom linked list implementation
 - **IssuePriorityQueue**: Heap-based priority queue
 - **ActivityStack**: Stack for activity logging
+
+**Part 2 - Event Data Structures:**
+- **EventSortedDictionary**: SortedDictionary for efficient event storage and retrieval
+- **SearchPatternTracker**: Dictionary-based search pattern analysis
+- **RecentlyViewedStack**: Stack for tracking recently viewed events
+- **CategoryManager**: HashSet for unique category management
 
 <br><br>
 
@@ -238,6 +282,8 @@ Microsoft. (2024). ASP.NET Core documentation. Retrieved from Microsoft Docs: ht
 
 Microsoft. (2024). C# programming guide. Retrieved from Microsoft Docs: https://docs.microsoft.com/en-us/dotnet/csharp/
 
+Microsoft. (2024). LINQ and async programming patterns. Retrieved from Microsoft Docs: https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/linq/
+
 Apple Inc. (2024). Human Interface Guidelines. Retrieved from Apple Developer: https://developer.apple.com/design/human-interface-guidelines/
 
 Bootstrap Team. (2024). Bootstrap Documentation. Retrieved from Bootstrap: https://getbootstrap.com/docs/
@@ -254,13 +300,17 @@ In the development of this project, AI tools were utilized as supplementary reso
 
 **OpenAI**: OpenAI, 2024. ChatGPT. Available at: https://openai.com [Accessed throughout development].
 
-**Claude AI**: Anthropic, 2024. Claude. Available at: https://claude.ai [Accessed for architectural guidance].
+**Claude AI**: Anthropic, 2024. Claude. Available at: https://claude.ai [Accessed for architectural guidance and problem-solving].
 
 AI assistance was primarily used for:
-- Understanding complex data structure implementations
+- Understanding complex data structure implementations (SortedDictionary, search algorithms)
 - Exploring Apple design principles and CSS techniques  
 - Reviewing MVC best practices and clean architecture
 - Debugging and optimization suggestions
+- Algorithm design for event recommendation system
+- Learning advanced LINQ queries and async/await patterns
+
+All code was written, understood, and tested by the developer. AI tools served as educational resources similar to documentation and Stack Overflow.
 
 <br>
 
