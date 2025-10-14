@@ -47,6 +47,10 @@ namespace CivicLink.Models
         [Phone(ErrorMessage = "Please enter a valid phone number")]
         public string ContactPhone { get; set; }
 
+        // Email for any questions
+        [EmailAddress(ErrorMessage = "Please enter a valid email address")]
+        public string ContactEmail { get; set; }
+
         // Is or isnt free?
         public bool IsFree { get; set; }
 
