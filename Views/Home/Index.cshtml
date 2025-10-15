@@ -20,6 +20,9 @@
         @if (userEngagement != null)
         {
             <!-- Gamification User Stats Display -->
+            <!-- This type of Gamification I actually used in the Varcity College Hackathon in August
+                I used a lot of the skills I learnt during that hackathon to build this part of the project
+            -->
             <div style="max-width: 600px; margin: 2rem auto 0; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 25px; padding: 2rem; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);">
                 <div style="display: flex; align-items: center; justify-content: space-around; margin-bottom: 2rem; flex-wrap: nowrap; gap: 1rem;">
                     <div style="display: flex; flex-direction: column; align-items: center; text-align: center; flex: 1;">
@@ -233,65 +236,69 @@
     </div>
 </div>
 
-<script>
-    // Added some interactive animations
-    document.addEventListener('DOMContentLoaded', function () {
-        // Animate stat numbers on scroll
-        const animateNumbers = () => {
-            const statNumbers = document.querySelectorAll('.stat-number');
-            statNumbers.forEach(stat => {
-                const finalNumber = parseInt(stat.textContent.replace(/[^\d]/g, ''));
-                if (finalNumber && !stat.hasAttribute('data-animated')) {
-                    stat.setAttribute('data-animated', 'true');
-                    animateValue(stat, 0, finalNumber, 2000);
-                }
-            });
-        };
-
-        const animateValue = (element, start, end, duration) => {
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                const current = Math.floor(progress * (end - start) + start);
-
-                if (element.textContent.includes('days')) {
-                    element.textContent = (current / 10).toFixed(1) + ' days';
-                } else {
-                    element.textContent = current.toLocaleString();
-                }
-
-                if (progress < 1) {
-                    window.requestAnimationFrame(step);
-                }
+    <script>
+        // Added some interactive animations
+        document.addEventListener('DOMContentLoaded', function () {
+            // Animate stat numbers on scroll
+            // This took me a while to figure out but I really like the effect
+            // Ive used this on wesbite builders befores so it was nice to do it in js
+            const animateNumbers = () => {
+                const statNumbers = document.querySelectorAll('.stat-number');
+                statNumbers.forEach(stat => {
+                    const finalNumber = parseInt(stat.textContent.replace(/[^\d]/g, ''));
+                    if (finalNumber && !stat.hasAttribute('data-animated')) {
+                        stat.setAttribute('data-animated', 'true');
+                        animateValue(stat, 0, finalNumber, 2000);
+                    }
+                });
             };
-            window.requestAnimationFrame(step);
-        };
 
-        // Trigger animation when stats come into view
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    animateNumbers();
-                }
+            const animateValue = (element, start, end, duration) => {
+                let startTimestamp = null;
+                const step = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                    const current = Math.floor(progress * (end - start) + start);
+
+                    if (element.textContent.includes('days')) {
+                        element.textContent = (current / 10).toFixed(1) + ' days';
+                    } else {
+                        element.textContent = current.toLocaleString();
+                    }
+
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    }
+                };
+                window.requestAnimationFrame(step);
+            };
+
+            // Trigger animation when stats come into view
+            // I really like this apple-ish inspired animations
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        animateNumbers();
+                    }
+                });
+            });
+
+            const statsSection = document.querySelector('.glass-card');
+            if (statsSection) {
+                observer.observe(statsSection);
+            }
+
+            // Added Hover effect
+            // I always incorperate hover effects in all my projects, its a small detail that really helps make a good UX/UI
+            const serviceCards = document.querySelectorAll('.service-card');
+            serviceCards.forEach(card => {
+                card.addEventListener('mouseenter', function () {
+                    this.style.transform = 'translateY(-10px) scale(1.02)';
+                });
+
+                card.addEventListener('mouseleave', function () {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
             });
         });
-
-        const statsSection = document.querySelector('.glass-card');
-        if (statsSection) {
-            observer.observe(statsSection);
-        }
-
-        // Add hover effect to service cards
-        const serviceCards = document.querySelectorAll('.service-card');
-        serviceCards.forEach(card => {
-            card.addEventListener('mouseenter', function () {
-                this.style.transform = 'translateY(-10px) scale(1.02)';
-            });
-
-            card.addEventListener('mouseleave', function () {
-                this.style.transform = 'translateY(0) scale(1)';
-            });
-        });
-    });
-</script>
+    </script>

@@ -14,7 +14,7 @@ namespace CivicLink.DataStructures
     public class EventSortedDictionary
     {
         // Events stored by ID in sorted order
-        // being sorted by ID allows for quick lookups and ordered traversal
+        // being sorted by ID allows for quick lookups and ordered navigation
         private SortedDictionary<int, Event> events;
 
         public EventSortedDictionary()

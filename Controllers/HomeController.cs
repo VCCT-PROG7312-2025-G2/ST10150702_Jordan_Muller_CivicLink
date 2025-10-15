@@ -69,6 +69,7 @@ namespace CivicLink.Controllers
                         "demo-user", pointsEarned, "issue reported");
 
                     // Set success message
+                    // This instant feedback is crucial for user satisfaction and the user engagement strategy as a whole
                     TempData["SuccessMessage"] = $"Issue reported successfully! Issue ID: {issueId}. You earned {pointsEarned} points!";
                     TempData["ShowBadges"] = updatedEngagement.Badges.Count > currentEngagement.Badges.Count;
 
@@ -81,7 +82,7 @@ namespace CivicLink.Controllers
                 }
             }
 
-            // If we get here, something failed, redisplay form
+            // This is if something has gone wrong and we need to redisplay the form
             ViewBag.UserEngagement = await _gamificationService.GetUserEngagementAsync("demo-user");
             ViewBag.AvailableBadges = await _gamificationService.GetAvailableBadgesAsync();
             return View(viewModel);
@@ -103,6 +104,8 @@ namespace CivicLink.Controllers
             return View(issue);
         }
 
+        // This is a default MVC method that came with the template
+        // Im not sure if we are ever expected to actually build out the privacy page but at the moment its blank
         public IActionResult Privacy()
         {
             return View();
@@ -121,6 +124,8 @@ namespace CivicLink.Controllers
             var events = await _eventService.SearchEventsAsync(searchTerm, category, date);
 
             // Apply sorting
+            // Learning about lambda expressions and LINQ has been a game changer for me
+            // If I had this back in Grade 12 I would have saved myself so much time
             events = sortBy switch
             {
                 "name" => events.OrderBy(e => e.Name).ToList(),
