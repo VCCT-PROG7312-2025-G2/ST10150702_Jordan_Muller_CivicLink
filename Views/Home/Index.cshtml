@@ -157,25 +157,23 @@
         </div>
 
         <!-- Service Status Card -->
-        <!-- This is only coming in part 3 so can stay disabled for now-->
         <div class="col-lg-4 col-md-6">
-            <div class="service-card" style="opacity: 0.6;">
-                <i class="fas fa-tasks service-icon" style="color: var(--medium-gray);"></i>
-                <h3 class="service-title" style="color: var(--medium-gray);">Request Status</h3>
+            <div class="service-card">
+                <i class="fas fa-tasks service-icon"></i>
+                <h3 class="service-title">Request Status</h3>
                 <p class="service-description">
-                    Track the progress of your service requests and receive real-time updates.
+                    Track the progress of your service requests using advanced search and relationship analysis.
                 </p>
-                <button class="btn btn-disabled" disabled>
-                    <i class="fas fa-lock me-2"></i>Coming in POE Part 3
-                </button>
+                <a href="@Url.Action("ServiceRequestStatus", "Home")" class="btn btn-apple">
+                    <i class="fas fa-search me-2"></i>Track Requests
+                </a>
                 <div class="mt-3">
                     <small class="text-muted">
-                        <i class="fas fa-clock me-1"></i>Available soon
+                        <i class="fas fa-project-diagram me-1"></i>View all Requests & Their Status
                     </small>
                 </div>
             </div>
         </div>
-    </div>
 
     <!-- Quick Stats Section -->
     <div class="row mt-5">
