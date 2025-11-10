@@ -7,6 +7,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<IIssueService, IssueService>();
 builder.Services.AddSingleton<IGamificationService, GamificationService>();
 builder.Services.AddSingleton<IEventService, EventService>();
+builder.Services.AddScoped<IServiceRequestService, ServiceRequestService>();
 
 var app = builder.Build();
 

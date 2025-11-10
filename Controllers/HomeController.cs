@@ -17,13 +17,16 @@ namespace CivicLink.Controllers
         private readonly IIssueService _issueService;
         private readonly IGamificationService _gamificationService;
         private readonly IEventService _eventService;
+        private readonly IServiceRequestService _serviceRequestService;
 
-        public HomeController(ILogger<HomeController> logger, IIssueService issueService, IGamificationService gamificationService, IEventService eventService)
+        public HomeController(ILogger<HomeController> logger, IIssueService issueService, IGamificationService gamificationService, IEventService eventService, IServiceRequestService serviceRequestService)
         {
             _logger = logger;
             _issueService = issueService;
             _gamificationService = gamificationService;
             _eventService = eventService;
+            _serviceRequestService = serviceRequestService;
+            _serviceRequestService = serviceRequestService;
         }
 
         public async Task<IActionResult> Index()
@@ -169,6 +172,102 @@ namespace CivicLink.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+
+        // Display service request status page with all tracking features
+        public async Task<IActionResult> ServiceRequestStatus(int? searchId, string sortBy, bool priorityView = false, bool graphView = false)
+        {
+            var viewModel = new ServiceRequestViewModel
+            {
+                ShowPriorityView = priorityView,
+                ShowGraphView = graphView,
+                SortBy = sortBy
+            };
+
+            // If searching by ID, use BST/AVL for efficient lookup
+            if (searchId.HasValue)
+            {
+                var request = await _serviceRequestService.GetRequestByIdAsync(searchId.Value);
+                if (request != null)
+                {
+                    viewModel.SelectedRequest = request;
+                    viewModel.RelatedRequests = await _serviceRequestService.GetRelatedRequestsAsync(searchId.Value);
+                    viewModel.Relationships = await _serviceRequestService.GetRequestRelationshipsAsync(searchId.Value);
+                }
+                viewModel.SearchQuery = searchId.ToString();
+            }
+
+            // Get service requests based on view type
+            if (priorityView)
+            {
+                // Use heap for priority-sorted view
+                viewModel.ServiceRequests = await _serviceRequestService.GetRequestsByPriorityAsync();
+            }
+            else
+            {
+                // Use BST for regular sorted view
+                viewModel.ServiceRequests = await _serviceRequestService.GetAllRequestsAsync();
+            }
+
+            // Apply sorting if specified
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                viewModel.ServiceRequests = sortBy switch
+                {
+                    "status" => viewModel.ServiceRequests.OrderBy(r => r.Status).ToList(),
+                    "category" => viewModel.ServiceRequests.OrderBy(r => r.Category).ToList(),
+                    "date" => viewModel.ServiceRequests.OrderByDescending(r => r.CreatedAt).ToList(),
+                    "priority" => viewModel.ServiceRequests.OrderByDescending(r => r.Priority).ToList(),
+                    _ => viewModel.ServiceRequests
+                };
+            }
+
+            // Get MST for graph view
+            if (graphView)
+            {
+                viewModel.MinimumSpanningTree = await _serviceRequestService.GetMinimumSpanningTreeAsync();
+            }
+
+            // Get statistics
+            viewModel.Statistics = await _serviceRequestService.GetRequestStatisticsAsync();
+
+            return View(viewModel);
+        }
+
+        // API endpoint for searching request by ID (returns JSON for AJAX)
+        [HttpGet]
+        public async Task<IActionResult> SearchRequestById(int id)
+        {
+            var request = await _serviceRequestService.GetRequestByIdAsync(id);
+            if (request == null)
+            {
+                return Json(new { success = false, message = "Request not found" });
+            }
+
+            var related = await _serviceRequestService.GetRelatedRequestsAsync(id);
+
+            return Json(new
+            {
+                success = true,
+                request = new
+                {
+                    id = request.Id,
+                    title = request.Title,
+                    status = request.Status.ToString(),
+                    priority = request.Priority.ToString(),
+                    category = request.Category.ToString(),
+                    location = request.Location,
+                    createdAt = request.CreatedAt.ToString("yyyy-MM-dd"),
+                    description = request.Description
+                },
+                relatedRequests = related.Select(r => new
+                {
+                    id = r.Id,
+                    title = r.Title,
+                    status = r.Status.ToString()
+                })
+            });
         }
 
         private int CalculatePointsForIssue(Issue issue)
