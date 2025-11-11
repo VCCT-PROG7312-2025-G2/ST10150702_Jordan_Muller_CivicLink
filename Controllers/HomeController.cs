@@ -58,12 +58,56 @@ namespace CivicLink.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ReportIssue(ReportIssueViewModel viewModel)
         {
+            // Debug logging to see what's happening
+            _logger.LogInformation("ReportIssue POST called");
+
+            // Remove validation for properties that aren't user input
+            ModelState.Remove("UserEngagement");
+            ModelState.Remove("AvailableBadges");
+            ModelState.Remove("Issue.Id");
+            ModelState.Remove("Issue.Status");
+            ModelState.Remove("Issue.CreatedAt");
+            ModelState.Remove("Issue.UpdatedAt");
+            ModelState.Remove("Issue.AttachmentPaths");
+
+            // Log model state errors for debugging
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(x => x.Value.Errors.Count > 0)
+                    .Select(x => new { x.Key, x.Value.Errors })
+                    .ToList();
+
+                foreach (var error in errors)
+                {
+                    foreach (var subError in error.Errors)
+                    {
+                        _logger.LogWarning($"ModelState Error - {error.Key}: {subError.ErrorMessage}");
+                    }
+                }
+            }
+
             if (ModelState.IsValid && viewModel?.Issue != null)
             {
                 try
                 {
+                    _logger.LogInformation($"Creating issue: {viewModel.Issue.Title}");
+
                     // Create the issue
                     var issueId = await _issueService.CreateIssueAsync(viewModel.Issue);
+
+                    _logger.LogInformation($"Issue created with ID: {issueId}");
+
+                    // Rebuild service request data structures with new issue
+                    try
+                    {
+                        await _serviceRequestService.RebuildDataStructuresAsync();
+                        _logger.LogInformation("Service request data structures rebuilt");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Failed to rebuild service request structures, but issue was created");
+                    }
 
                     // Update user engagement
                     var pointsEarned = CalculatePointsForIssue(viewModel.Issue);
@@ -72,22 +116,37 @@ namespace CivicLink.Controllers
                         "demo-user", pointsEarned, "issue reported");
 
                     // Set success message
-                    // This instant feedback is crucial for user satisfaction and the user engagement strategy as a whole
                     TempData["SuccessMessage"] = $"Issue reported successfully! Issue ID: {issueId}. You earned {pointsEarned} points!";
                     TempData["ShowBadges"] = updatedEngagement.Badges.Count > currentEngagement.Badges.Count;
+
+                    _logger.LogInformation("Redirecting to ReportIssue after successful submission");
 
                     return RedirectToAction(nameof(ReportIssue));
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error creating issue");
-                    ModelState.AddModelError("", "An error occurred while submitting your issue. Please try again.");
+                    ModelState.AddModelError("", $"An error occurred while submitting your issue: {ex.Message}");
+                }
+            }
+            else
+            {
+                _logger.LogWarning("ModelState is invalid or viewModel.Issue is null");
+
+                if (!ModelState.IsValid)
+                {
+                    // Add a friendly error message
+                    ModelState.AddModelError("", "Please check all required fields and try again.");
                 }
             }
 
-            // This is if something has gone wrong and we need to redisplay the form
-            ViewBag.UserEngagement = await _gamificationService.GetUserEngagementAsync("demo-user");
-            ViewBag.AvailableBadges = await _gamificationService.GetAvailableBadgesAsync();
+            // If we got here, something failed, redisplay form
+            _logger.LogInformation("Redisplaying form due to validation errors");
+
+            viewModel = viewModel ?? new ReportIssueViewModel();
+            viewModel.UserEngagement = await _gamificationService.GetUserEngagementAsync("demo-user");
+            viewModel.AvailableBadges = await _gamificationService.GetAvailableBadgesAsync();
+
             return View(viewModel);
         }
 

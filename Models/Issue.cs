@@ -22,9 +22,9 @@ namespace CivicLink.Models
         [StringLength(200, ErrorMessage = "Location cannot exceed 200 characters")]
         public string Location { get; set; }
 
-        public IssuePriority Priority { get; set; }
+        public IssuePriority Priority { get; set; } = IssuePriority.Medium;
 
-        public IssueStatus Status { get; set; }
+        public IssueStatus Status { get; set; } = IssueStatus.Submitted;
 
         public DateTime CreatedAt { get; set; }
 
@@ -33,7 +33,6 @@ namespace CivicLink.Models
         // I found this wasnt actually working the way I wanted it to from part 1 and thus changed it to the active code below
         // public List<string> AttachmentPaths { get; set; } = new List<string>();
         public Queue<string> AttachmentPaths { get; set; } = new Queue<string>();
-
 
         public string ContactName { get; set; }
 

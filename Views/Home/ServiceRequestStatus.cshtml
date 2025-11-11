@@ -1,4 +1,4 @@
-﻿@* Part 3: Service Request Status tracking with advanced data structures visualization *@
+﻿@* Part 3: Service Request Status tracking page *@
 
 @model CivicLink.Models.ServiceRequestViewModel
 @{
@@ -33,15 +33,12 @@
         </div>
     </div>
 
-    <!-- Search and Statistics Row -->
+    <!-- Search Section -->
     <div class="row mb-4">
-
-        <!-- Search by ID Box -->
-        <div class="col-lg-8">
+        <div class="col-12">
             <div class="glass-card" style="padding: 2rem;">
                 <h5 class="mb-3">
                     <i class="fas fa-search me-2"></i>Track Request by ID
-                    <small class="text-muted">(Using Binary Search Tree)</small>
                 </h5>
 
                 <form asp-action="ServiceRequestStatus" method="get" id="searchForm">
@@ -80,37 +77,36 @@
                 }
             </div>
         </div>
+    </div>
 
-        <!-- Statistics Dashboard -->
-        <div class="col-lg-4">
-            <div class="glass-card" style="padding: 2rem;">
-                <h5 class="mb-3">
-                    <i class="fas fa-chart-bar me-2"></i>Quick Stats
-                </h5>
+    <!-- Statistics Dashboard -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="glass-card" style="padding: 1.5rem;">
                 <div class="row text-center">
-                    <div class="col-6 mb-2">
-                        <div class="stat-number" style="font-size: 2rem; color: var(--primary-color);">
+                    <div class="col-6 col-md-3 mb-3 mb-md-0">
+                        <div class="stat-number" style="font-size: 2.5rem; font-weight: 700; color: var(--primary-color);">
                             @(Model.Statistics.ContainsKey("Total") ? Model.Statistics["Total"] : 0)
                         </div>
-                        <div class="stat-label" style="font-size: 0.85rem;">Total Requests</div>
+                        <div class="stat-label" style="font-size: 0.9rem; color: var(--medium-gray); font-weight: 500;">Total Requests</div>
                     </div>
-                    <div class="col-6 mb-2">
-                        <div class="stat-number" style="font-size: 2rem; color: var(--warning-color);">
+                    <div class="col-6 col-md-3 mb-3 mb-md-0">
+                        <div class="stat-number" style="font-size: 2.5rem; font-weight: 700; color: var(--warning-color);">
                             @(Model.Statistics.ContainsKey("InProgress") ? Model.Statistics["InProgress"] : 0)
                         </div>
-                        <div class="stat-label" style="font-size: 0.85rem;">In Progress</div>
+                        <div class="stat-label" style="font-size: 0.9rem; color: var(--medium-gray); font-weight: 500;">In Progress</div>
                     </div>
-                    <div class="col-6">
-                        <div class="stat-number" style="font-size: 2rem; color: var(--success-color);">
+                    <div class="col-6 col-md-3">
+                        <div class="stat-number" style="font-size: 2.5rem; font-weight: 700; color: var(--success-color);">
                             @(Model.Statistics.ContainsKey("Resolved") ? Model.Statistics["Resolved"] : 0)
                         </div>
-                        <div class="stat-label" style="font-size: 0.85rem;">Resolved</div>
+                        <div class="stat-label" style="font-size: 0.9rem; color: var(--medium-gray); font-weight: 500;">Resolved</div>
                     </div>
-                    <div class="col-6">
-                        <div class="stat-number" style="font-size: 2rem; color: var(--danger-color);">
+                    <div class="col-6 col-md-3">
+                        <div class="stat-number" style="font-size: 2.5rem; font-weight: 700; color: var(--danger-color);">
                             @(Model.Statistics.ContainsKey("Critical") ? Model.Statistics["Critical"] : 0)
                         </div>
-                        <div class="stat-label" style="font-size: 0.85rem;">Critical</div>
+                        <div class="stat-label" style="font-size: 0.9rem; color: var(--medium-gray); font-weight: 500;">Critical</div>
                     </div>
                 </div>
             </div>
@@ -142,8 +138,36 @@
                                 @Model.SelectedRequest.Priority
                             </span><br />
                             <strong><i class="fas fa-info me-2"></i>Status:</strong>
-                            <span class="status-badge status-@Model.SelectedRequest.Status.ToString().ToLower()">
-                                @Model.SelectedRequest.Status
+                            @{
+                                var detailStatusBg = Model.SelectedRequest.Status switch
+                                {
+                                    IssueStatus.Submitted => "rgba(0, 122, 255, 0.2)",
+                                    IssueStatus.InReview => "rgba(255, 149, 0, 0.2)",
+                                    IssueStatus.InProgress => "rgba(88, 86, 214, 0.2)",
+                                    IssueStatus.Resolved => "rgba(52, 199, 89, 0.2)",
+                                    IssueStatus.Closed => "rgba(142, 142, 147, 0.2)",
+                                    _ => "rgba(142, 142, 147, 0.2)"
+                                };
+
+                                var detailStatusColor = Model.SelectedRequest.Status switch
+                                {
+                                    IssueStatus.Submitted => "#0051D5",
+                                    IssueStatus.InReview => "#CC7700",
+                                    IssueStatus.InProgress => "#3634A3",
+                                    IssueStatus.Resolved => "#248A3D",
+                                    IssueStatus.Closed => "#48484A",
+                                    _ => "#48484A"
+                                };
+
+                                var detailStatusText = Model.SelectedRequest.Status switch
+                                {
+                                    IssueStatus.InProgress => "IN PROGRESS",
+                                    IssueStatus.InReview => "IN REVIEW",
+                                    _ => Model.SelectedRequest.Status.ToString().ToUpper()
+                                };
+                            }
+                            <span style="display: inline-block; padding: 0.35rem 0.85rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; background: @detailStatusBg; color: @detailStatusColor; border: 1px solid @detailStatusColor;">
+                                @detailStatusText
                             </span><br />
                             <strong><i class="fas fa-tag me-2"></i>Category:</strong> @Model.SelectedRequest.Category
                         </div>
@@ -160,7 +184,6 @@
                         <div style="background: rgba(0, 122, 255, 0.1); padding: 1.5rem; border-radius: 12px;">
                             <h6 class="mb-3">
                                 <i class="fas fa-project-diagram me-2"></i>Related Requests
-                                <small class="text-muted">(Using Graph)</small>
                             </h6>
                             @foreach (var related in Model.RelatedRequests.Take(3))
                             {
@@ -183,75 +206,43 @@
     <!-- Filter and Sort Controls -->
     <div class="glass-card" style="padding: 1.5rem; margin-bottom: 2rem;">
         <form asp-action="ServiceRequestStatus" method="get">
-            <div class="row align-items-end">
-                <div class="col-md-10">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <label class="form-label">Sort By</label>
-                            <select name="sortBy" class="form-select">
-                                <option value="">Default (ID)</option>
-                                <option value="status" selected="@(Model.SortBy == "status")">Status</option>
-                                <option value="priority" selected="@(Model.SortBy == "priority")">Priority</option>
-                                <option value="date" selected="@(Model.SortBy == "date")">Date</option>
-                                <option value="category" selected="@(Model.SortBy == "category")">Category</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">View Type</label>
-                            <select name="priorityView" class="form-select">
-                                <option value="false" selected="@(!Model.ShowPriorityView)">Standard (BST)</option>
-                                <option value="true" selected="@(Model.ShowPriorityView)">Priority (Heap)</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Graph View</label>
-                            <select name="graphView" class="form-select">
-                                <option value="false" selected="@(!Model.ShowGraphView)">Hide</option>
-                                <option value="true" selected="@(Model.ShowGraphView)">Show MST</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <button type="submit" class="btn btn-apple w-100">
-                                <i class="fas fa-filter me-2"></i>Apply
-                            </button>
-                        </div>
-                    </div>
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label"><strong>Sort By</strong></label>
+                    <select name="sortBy" class="form-select">
+                        <option value="">Default (ID)</option>
+                        <option value="status" selected="@(Model.SortBy == "status")">Status</option>
+                        <option value="priority" selected="@(Model.SortBy == "priority")">Priority</option>
+                        <option value="date" selected="@(Model.SortBy == "date")">Date</option>
+                        <option value="category" selected="@(Model.SortBy == "category")">Category</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label"><strong>View Type</strong></label>
+                    <select name="priorityView" class="form-select">
+                        <option value="false" selected="@(!Model.ShowPriorityView)">Standard</option>
+                        <option value="true" selected="@(Model.ShowPriorityView)">Priority</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label"><strong>Graph View</strong></label>
+                    <select name="graphView" class="form-select">
+                        <option value="false" selected="@(!Model.ShowGraphView)">Hide</option>
+                        <option value="true" selected="@(Model.ShowGraphView)">Show Relationships</option>
+                    </select>
                 </div>
                 <div class="col-md-2">
+                    <button type="submit" class="btn btn-apple w-100">
+                        <i class="fas fa-filter me-2"></i>Apply
+                    </button>
+                </div>
+                <div class="col-md-1">
                     <a href="@Url.Action("ServiceRequestStatus")" class="btn btn-secondary-apple w-100">
-                        <i class="fas fa-redo me-2"></i>Reset
+                        <i class="fas fa-redo"></i>
                     </a>
                 </div>
             </div>
         </form>
-    </div>
-
-    <!-- Data Structure Info Banner -->
-    <div class="alert alert-info" style="border-radius: 12px; border-left: 4px solid var(--primary-color);">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <strong><i class="fas fa-info-circle me-2"></i>Advanced Data Structures in Use:</strong>
-                @if (Model.ShowPriorityView)
-                {
-                    <span class="badge bg-primary ms-2">Min-Heap (Priority Queue)</span>
-                }
-                else
-                {
-                    <span class="badge bg-primary ms-2">Binary Search Tree & AVL Tree</span>
-                }
-                @if (Model.ShowGraphView)
-                {
-                    <span class="badge bg-success ms-2">Graph with MST (Kruskal's Algorithm)</span>
-                }
-                <span class="badge bg-info ms-2">Graph (BFS/DFS Traversal)</span>
-            </div>
-            <div class="col-md-4 text-end">
-                <small class="text-muted">
-                    <strong>Tree Nodes:</strong> @(Model.Statistics.ContainsKey("BSTNodes") ? Model.Statistics["BSTNodes"] : 0) |
-                    <strong>Heap Size:</strong> @(Model.Statistics.ContainsKey("HeapSize") ? Model.Statistics["HeapSize"] : 0)
-                </small>
-            </div>
-        </div>
     </div>
 
     <!-- Service Requests List -->
@@ -261,25 +252,53 @@
             @foreach (var request in Model.ServiceRequests)
             {
                 <div class="col-lg-6 col-xl-4 mb-4">
-                    <div class="glass-card priority-@request.Priority.ToString().ToLower()" style="padding: 1.5rem; height: 100%;">
+                    <div class="glass-card priority-@request.Priority.ToString().ToLower()" style="padding: 1.5rem; height: 100%; display: flex; flex-direction: column;">
 
                         <!-- Request Header -->
                         <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div>
+                            <div class="flex-grow-1">
                                 <h5 class="mb-1" style="font-weight: 600;">@request.Title</h5>
                                 <small class="text-muted">
                                     <i class="fas fa-hashtag me-1"></i>#@request.Id.ToString("D4")
                                 </small>
                             </div>
-                            <div class="text-end">
-                                <span class="status-badge status-@request.Status.ToString().ToLower()">
-                                    @request.Status
+                            <div>
+                                @{
+                                    var statusBg = request.Status switch
+                                    {
+                                        IssueStatus.Submitted => "rgba(0, 122, 255, 0.2)",
+                                        IssueStatus.InReview => "rgba(255, 149, 0, 0.2)",
+                                        IssueStatus.InProgress => "rgba(88, 86, 214, 0.2)",
+                                        IssueStatus.Resolved => "rgba(52, 199, 89, 0.2)",
+                                        IssueStatus.Closed => "rgba(142, 142, 147, 0.2)",
+                                        _ => "rgba(142, 142, 147, 0.2)"
+                                    };
+
+                                    var statusColor = request.Status switch
+                                    {
+                                        IssueStatus.Submitted => "#0051D5",
+                                        IssueStatus.InReview => "#CC7700",
+                                        IssueStatus.InProgress => "#3634A3",
+                                        IssueStatus.Resolved => "#248A3D",
+                                        IssueStatus.Closed => "#48484A",
+                                        _ => "#48484A"
+                                    };
+
+                                    var statusText = request.Status switch
+                                    {
+                                        IssueStatus.InProgress => "INPROGRESS",
+                                        IssueStatus.InReview => "INREVIEW",
+                                        _ => request.Status.ToString().ToUpper()
+                                    };
+                                }
+                                <span style="display: inline-block; padding: 0.35rem 0.85rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; background: @statusBg; color: @statusColor; border: 1px solid @statusColor; white-space: nowrap;">
+                                    @statusText
                                 </span>
                             </div>
                         </div>
 
                         <!-- Request Info -->
-                        <div class="mb-3">
+                        <div class="mb-3 flex-grow-1">
                             <div class="mb-2">
                                 <span class="badge priority-badge-@request.Priority.ToString().ToLower()">
                                     @request.Priority Priority
@@ -313,7 +332,7 @@
                                     IssueStatus.Closed => 100,
                                     _ => 0
                                 };
-                                var progressColor = request.Status == IssueStatus.Resolved ? "var(--success-color)" : "var(--primary-color)";
+                                var progressColor = request.Status == IssueStatus.Resolved || request.Status == IssueStatus.Closed ? "var(--success-color)" : "var(--primary-color)";
                             }
                             <div class="progress" style="height: 6px; background: rgba(142, 142, 147, 0.2);">
                                 <div class="progress-bar" style="width: @progressPercent%; background: @progressColor;"></div>
@@ -322,7 +341,7 @@
                         </div>
 
                         <!-- Action Buttons -->
-                        <div class="d-flex gap-2">
+                        <div class="d-flex gap-2 mt-auto">
                             <a href="@Url.Action("ServiceRequestStatus", new { searchId = request.Id })"
                                class="btn btn-secondary-apple btn-sm flex-fill">
                                 <i class="fas fa-search me-1"></i>Track
@@ -352,16 +371,15 @@
     <!-- Minimum Spanning Tree Visualization -->
     @if (Model.ShowGraphView && Model.MinimumSpanningTree.Any())
     {
-        <div class="glass-card" style="padding: 2rem; margin-top: 2rem;">
+        <div class="glass-card" style="padding: 2rem; margin-top: 2rem; margin-bottom: 2rem;">
             <h5 class="mb-3">
-                <i class="fas fa-project-diagram me-2"></i>Request Relationships (Minimum Spanning Tree)
-                <small class="text-muted">- Optimal connections between related requests</small>
+                <i class="fas fa-project-diagram me-2"></i>Request Relationships
+                <small class="text-muted">Optimal connections between related requests</small>
             </h5>
 
-            <div class="alert alert-info mb-3">
-                <strong><i class="fas fa-info-circle me-2"></i>Algorithm:</strong> Kruskal's MST Algorithm |
-                <strong>Edges:</strong> @Model.MinimumSpanningTree.Count |
-                <strong>Purpose:</strong> Shows the most efficient relationships between service requests
+            <div class="alert alert-info mb-3" style="border-radius: 12px;">
+                <strong><i class="fas fa-info-circle me-2"></i>Showing:</strong>
+                @Model.MinimumSpanningTree.Count connection(s) based on location, category, and timing similarities
             </div>
 
             <div class="mst-visualization">
@@ -376,7 +394,7 @@
                                 <i class="fas fa-arrows-alt-h text-primary"></i>
                                 <span class="badge bg-primary ms-2">@edge.RelationshipType</span>
                                 <br />
-                                <small class="text-muted">Weight: @edge.Weight.ToString("F2")</small>
+                                <small class="text-muted">Similarity: @((10 - edge.Weight).ToString("F1"))/10</small>
                             </div>
                             <div class="col-md-4 text-end">
                                 <strong>Request #@edge.ToId.ToString("D4")</strong>
@@ -393,34 +411,6 @@
             </div>
         </div>
     }
-
-    <!-- Technical Information Footer -->
-    <div class="glass-card" style="padding: 2rem; margin-top: 2rem; margin-bottom: 2rem;">
-        <h5 class="mb-3">
-            <i class="fas fa-code me-2"></i>Part 3: Technical Implementation
-        </h5>
-        <div class="row">
-            <div class="col-md-6">
-                <h6>Data Structures Used:</h6>
-                <ul>
-                    <li><strong>Binary Search Tree (BST):</strong> O(log n) average search complexity for request lookup</li>
-                    <li><strong>AVL Tree:</strong> Self-balancing BST ensuring O(log n) worst-case performance</li>
-                    <li><strong>Min-Heap:</strong> Priority queue for efficient highest-priority request access</li>
-                    <li><strong>Graph:</strong> Represents relationships between service requests</li>
-                </ul>
-            </div>
-            <div class="col-md-6">
-                <h6>Algorithms Implemented:</h6>
-                <ul>
-                    <li><strong>BST Insertion & Search:</strong> Efficient request management</li>
-                    <li><strong>AVL Rotations:</strong> Automatic tree balancing</li>
-                    <li><strong>Heap Operations:</strong> Insert, extract-min, heapify</li>
-                    <li><strong>BFS/DFS Traversal:</strong> Finding related requests</li>
-                    <li><strong>Kruskal's MST:</strong> Finding optimal request connections</li>
-                </ul>
-            </div>
-        </div>
-    </div>
 </div>
 
 @section Scripts {
@@ -430,7 +420,9 @@
             const statNumbers = document.querySelectorAll('.stat-number');
             statNumbers.forEach(stat => {
                 const finalValue = parseInt(stat.textContent);
-                animateValue(stat, 0, finalValue, 1000);
+                if (finalValue && !isNaN(finalValue)) {
+                    animateValue(stat, 0, finalValue, 1000);
+                }
             });
 
             function animateValue(element, start, end, duration) {

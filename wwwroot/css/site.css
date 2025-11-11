@@ -497,6 +497,43 @@ body {
    ISSUESLIST.CSHTML - ISSUES LIST STYLES
    ========================================== */
 
+/* Priority Badge Styles - Only affects the badge elements */
+.priority-badge-low {
+    background: rgba(52, 199, 89, 0.2);
+    color: #248A3D;
+    border: 1px solid rgba(52, 199, 89, 0.4);
+}
+
+.priority-badge-medium {
+    background: rgba(255, 149, 0, 0.2);
+    color: #CC7700;
+    border: 1px solid rgba(255, 149, 0, 0.4);
+}
+
+.priority-badge-high {
+    background: rgba(255, 59, 48, 0.2);
+    color: #D70015;
+    border: 1px solid rgba(255, 59, 48, 0.4);
+}
+
+.priority-badge-critical {
+    background: rgba(139, 0, 0, 0.2);
+    color: #8B0000;
+    border: 1px solid rgba(139, 0, 0, 0.4);
+}
+
+/* Base badge styling */
+.badge {
+    padding: 0.35rem 0.85rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
+}
+
+
 /* Priority Indicators */
 .priority-low {
     border-left: 4px solid var(--success-color);
@@ -516,37 +553,43 @@ body {
 
 /* Status Badges */
 .status-badge {
-    padding: 0.25rem 0.75rem;
+    padding: 0.35rem 0.85rem;
     border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 500;
+    font-size: 0.75rem;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    display: inline-block;
 }
 
 .status-submitted {
-    background: rgba(0, 122, 255, 0.1);
-    color: var(--primary-color);
+    background: rgba(0, 122, 255, 0.2);
+    color: #0051D5;
+    border: 1px solid rgba(0, 122, 255, 0.4);
 }
 
 .status-inreview {
-    background: rgba(255, 149, 0, 0.1);
-    color: var(--warning-color);
+    background: rgba(255, 149, 0, 0.2);
+    color: #CC7700;
+    border: 1px solid rgba(255, 149, 0, 0.4);
 }
 
 .status-inprogress {
-    background: rgba(88, 86, 214, 0.1);
-    color: var(--secondary-color);
+    background: rgba(88, 86, 214, 0.2);
+    color: #3634A3;
+    border: 1px solid rgba(88, 86, 214, 0.4);
 }
 
 .status-resolved {
-    background: rgba(52, 199, 89, 0.1);
-    color: var(--success-color);
+    background: rgba(52, 199, 89, 0.2);
+    color: #248A3D;
+    border: 1px solid rgba(52, 199, 89, 0.4);
 }
 
 .status-closed {
-    background: rgba(142, 142, 147, 0.1);
-    color: var(--medium-gray);
+    background: rgba(142, 142, 147, 0.2);
+    color: #48484A;
+    border: 1px solid rgba(142, 142, 147, 0.4);
 }
 
 /* ==========================================
