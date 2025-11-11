@@ -1,6 +1,8 @@
 ﻿
 
 // User engagement models for gamification including points, levels, badges, and achievement tracking
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+
 namespace CivicLink.Models
 {
     public class UserEngagement
@@ -45,6 +47,8 @@ namespace CivicLink.Models
         public UserEngagement UserEngagement { get; set; }
         public List<Badge> AvailableBadges { get; set; } = new List<Badge>();
         public bool ShowSuccessMessage { get; set; }
+
+        [ValidateNever]
         public string SuccessMessage { get; set; }
     }
 }
