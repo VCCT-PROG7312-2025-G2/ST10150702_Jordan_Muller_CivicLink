@@ -10,11 +10,12 @@
  <br>
  <strong>Module:</strong> PROG7312 - Data Structures & Algorithms<br>
  <strong>Institution:</strong> Varsity College<br><br>
+ Youtube Link to Demonstrative Video for Part 1: <br>
+ https://youtu.be/wt6HDalCAVk <br>
  Youtube Link to Demonstrative Video for Part 2: <br>
  https://youtu.be/5Nd3AzEvqM0 <br>
- <br>
  Youtube Link to Demonstrative Video for Part 3: <br>
- [link >>>>>>>>>>] <br><br>
+ https://youtu.be/t4SWvaPM_Ao<br><br>
 </p>
 <br>
 
@@ -793,3 +794,4 @@ Jordan Muller | ST10150702 | 2024
 </p>
 
 ---
+
